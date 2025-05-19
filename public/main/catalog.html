@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">University Library | Catalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+    <style>
+        /* Extend main.css styles */
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #6d28d9;
+            --accent-color: #f59e0b;
+            --light-color: #f8fafc;
+            --dark-color: #0f172a;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #ffffff;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --footer-bg: #1e40af;
+            --footer-text: #f8fafc;
+            --input-bg: #f1f5f9;
+            --input-border: #cbd5e1;
+            --glass-blur: 12px;
+            --border-radius: 10px;
+            --transition: all 0.3s ease-in-out;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        html[dir="rtl"] {
+            font-family: "Noto Sans Arabic", sans-serif;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(109, 40, 217, 0.85)),
+                url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da");
+            background-size: cover;
+            background-position: center;
+            padding: 120px 0 80px;
+            min-height: 50vh;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.15);
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            color: var(--text-color);
+            transition: var(--transition);
+            z-index: 11;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+
+        .btn-search {
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+            z-index: 11;
+        }
+
+        .btn-search:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 12;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .search-suggestions.show {
+            display: block;
+        }
+
+        .search-suggestion-item {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-suggestion-item:hover,
+        .search-suggestion-item.selected {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .book-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .book-img {
+            height: 200px;
+            overflow: hidden;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        .book-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .book-card:hover .book-img img {
+            transform: scale(1.05);
+        }
+
+        .book-status {
+            font-size: 0.85rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--white);
+        }
+
+        .status-available { background: #10b981; }
+        .status-checked-out { background: #ef4444; }
+        .status-reserved { background: #f59e0b; }
+        .status-under-maintenance { background: #6b7280; }
+        .status-lost { background: #1f2937; }
+
+        .btn-reserve {
+            background: var(--secondary-color);
+            color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-reserve:hover {
+            background: #5b21b6;
+            transform: translateY(-2px);
+        }
+
+        .filter-group {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-py {
+            padding: 60px 0;
+        }
+
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--white) !important;
+        }
+
+        .footer-main {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 60px 0;
+        }
+
+        @media (max-width: 767px) {
+            .hero-section {
+                padding: 80px 0 60px;
+                min-height: 40vh;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .filter-group {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="fixed-header">
+        <div class="header-top-bar">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="tel:(123)456-7890"><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</a>
+                        <a href="mailto:info@unilibrary.org" class="ms-4"><i class="fas fa-envelope me-2"></i>info@unilibrary.org</a>
+                    </div>
+                    <div class="language-selector">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="language-text">EN</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-us me-2"></span>English</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-dz me-2"></span>العربية</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav.home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav.resources">Resources</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav.services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search-guide.html" data-i18n="nav.searchGuide">Search Guide</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="catalog.html" data-i18n="nav.catalog">Catalog</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav.contact">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="login.html" data-i18n="nav.login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title" data-i18n="hero.title">Explore Our Library Catalog</h1>
+            <p class="hero-subtitle" data-i18n="hero.subtitle">Find books, journals, and digital resources with ease.</p>
+            <div class="search-box glassmorphism mt-4">
+                <div class="search-container">
+                    <div class="search-input-group d-flex">
+                        <input type="text" class="search-input form-control" placeholder="Search by title, author, ISBN, or keywords..." aria-label="Search" data-i18n="[placeholder]search.placeholder">
+                        <button class="btn-search ms-2" data-i18n="search.button">Search</button>
+                    </div>
+                    <div class="search-suggestions" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="catalog-section section-py">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 mb-4">
+                    <div class="filter-group">
+                        <h4 data-i18n="filters.title">Filters</h4>
+                        <div class="mb-3">
+                            <label for="statusFilter" class="form-label" data-i18n="filters.status">Status</label>
+                            <select id="statusFilter" class="form-select">
+                                <option value="" data-i18n="filters.all">All</option>
+                                <option value="AVAILABLE" data-i18n="filters.available">Available</option>
+                                <option value="CHECKED_OUT" data-i18n="filters.checkedOut">Checked Out</option>
+                                <option value="RESERVED" data-i18n="filters.reserved">Reserved</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="languageFilter" class="form-label" data-i18n="filters.language">Language</label>
+                            <select id="languageFilter" class="form-select">
+                                <option value="" data-i18n="filters.all">All</option>
+                                <option value="English">English</option>
+                                <option value="Arabic">Arabic</option>
+                                <option value="French">French</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row" id="bookList">
+                        <!-- Book cards will be dynamically inserted here -->
+                    </div>
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-secondary" id="loadMore" data-i18n="catalog.loadMore">Load More</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <a class="footer-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
+                    <p class="footer-about mt-3" data-i18n="footer.about">Providing world-class resources and services since 1965.</p>
+                </div>
+                <div class="col-lg-4">
+                    <h4 class="footer-title" data-i18n="footer.quickLinks.title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html" data-i18n="footer.quickLinks.home">Home</a></li>
+                        <li><a href="catalog.html" data-i18n="footer.quickLinks.catalog">Library Catalog</a></li>
+                        <li><a href="search-guide.html" data-i18n="footer.quickLinks.searchGuide">Search Guide</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h4 class="footer-title" data-i18n="footer.contact.title">Contact Us</h4>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="footer.contact.address">123 University Ave, City, State 12345</span></p>
+                        <p><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i>info@unilibrary.org</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        const translations = {
+            en: {
+                title: "University Library | Catalog",
+                nav: {
+                    home: "Home",
+                    resources: "Resources",
+                    services: "Services",
+                    searchGuide: "Search Guide",
+                    catalog: "Catalog",
+                    contact: "Contact",
+                    login: "Login"
+                },
+                hero: {
+                    title: "Explore Our Library Catalog",
+                    subtitle: "Find books, journals, and digital resources with ease."
+                },
+                search: {
+                    placeholder: "Search by title, author, ISBN, or keywords...",
+                    button: "Search"
+                },
+                filters: {
+                    title: "Filters",
+                    status: "Status",
+                    language: "Language",
+                    all: "All",
+                    available: "Available",
+                    checkedOut: "Checked Out",
+                    reserved: "Reserved"
+                },
+                catalog: {
+                    authors: "Authors",
+                    isbn: "ISBN",
+                    status: "Status",
+                    reserve: "Reserve",
+                    loadMore: "Load More",
+                    noResults: "No books found.",
+                    loginPrompt: "Please log in to reserve a book.",
+                    limitReached: "You have reached your reservation limit (3 books).",
+                    notAvailable: "This book is not available for reservation."
+                },
+                footer: {
+                    about: "Providing world-class resources and services since 1965.",
+                    quickLinks: {
+                        title: "Quick Links",
+                        home: "Home",
+                        catalog: "Library Catalog",
+                        searchGuide: "Search Guide"
+                    },
+                    contact: {
+                        title: "Contact Us",
+                        address: "123 University Ave, City, State 12345"
+                    }
+                }
+            },
+            ar: {
+                title: "مكتبة الجامعة | الكتالوج",
+                nav: {
+                    home: "الرئيسية",
+                    resources: "الموارد",
+                    services: "الخدمات",
+                    searchGuide: "دليل البحث",
+                    catalog: "الكتالوج",
+                    contact: "اتصل بنا",
+                    login: "تسجيل الدخول"
+                },
+                hero: {
+                    title: "استكشف كتالوج المكتبة",
+                    subtitle: "ابحث عن الكتب والمجلات والموارد الرقمية بسهولة."
+                },
+                search: {
+                    placeholder: "ابحث حسب العنوان، المؤلف، ISBN، أو الكلمات المفتاحية...",
+                    button: "بحث"
+                },
+                filters: {
+                    title: "الفلاتر",
+                    status: "الحالة",
+                    language: "اللغة",
+                    all: "الكل",
+                    available: "متوفر",
+                    checkedOut: "معار",
+                    reserved: "محجوز"
+                },
+                catalog: {
+                    authors: "المؤلفون",
+                    isbn: "ISBN",
+                    status: "الحالة",
+                    reserve: "حجز",
+                    loadMore: "تحميل المزيد",
+                    noResults: "لم يتم العثور على كتب.",
+                    loginPrompt: "يرجى تسجيل الدخول لحجز كتاب.",
+                    limitReached: "لقد وصلت إلى الحد الأقصى للحجوزات (3 كتب).",
+                    notAvailable: "هذا الكتاب غير متاح للحجز."
+                },
+                footer: {
+                    about: "توفير موارد وخدمات عالمية المستوى منذ عام 1965.",
+                    quickLinks: {
+                        title: "روابط سريعة",
+                        home: "الرئيسية",
+                        catalog: "كتالوج المكتبة",
+                        searchGuide: "دليل البحث"
+                    },
+                    contact: {
+                        title: "اتصل بنا",
+                        address: "123 شارع الجامعة، المدينة، الولاية 12345"
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({ duration: 800, easing: 'ease-out-quart', once: true });
+
+            // Initialize language
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            applyLanguage(savedLanguage);
+            document.documentElement.lang = savedLanguage;
+            document.documentElement.setAttribute('dir', savedLanguage === 'ar' ? 'rtl' : 'ltr');
+            document.querySelector('.language-text').textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
+
+            // Language selector
+            document.querySelectorAll('.language-selector .dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const selectedLang = item.getAttribute('data-lang');
+                    localStorage.setItem('language', selectedLang);
+                    applyLanguage(selectedLang);
+                    document.documentElement.lang = selectedLang;
+                    document.documentElement.setAttribute('dir', selectedLang === 'ar' ? 'rtl' : 'ltr');
+                    document.querySelector('.language-text').textContent = selectedLang === 'ar' ? 'AR' : 'EN';
+                    document.querySelectorAll('.dropdown-item').forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
+                    fetchBooks(); // Refresh book list with new language
+                });
+            });
+
+            // Search and filter functionality
+            const searchInput = document.querySelector('.search-input');
+            const searchSuggestions = document.querySelector('.search-suggestions');
+            const statusFilter = document.querySelector('#statusFilter');
+            const languageFilter = document.querySelector('#languageFilter');
+            const bookList = document.querySelector('#bookList');
+            const loadMoreBtn = document.querySelector('#loadMore');
+            let page = 1;
+            let isLoading = false;
+
+            const fetchBooks = async (reset = false) => {
+                if (isLoading) return;
+                isLoading = true;
+                if (reset) {
+                    page = 1;
+                    bookList.innerHTML = '';
+                }
+
+                const query = searchInput.value.trim();
+                const status = statusFilter.value;
+                const language = languageFilter.value;
+                const url = `http://localhost:5000/api/search?query=${encodeURIComponent(query)}&status=${status}&language=${language}&page=${page}&limit=6`;
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.books.length === 0 && page === 1) {
+                        bookList.innerHTML = `<p class="text-center" data-i18n="catalog.noResults">${translations[savedLanguage].catalog.noResults}</p>`;
+                        loadMoreBtn.style.display = 'none';
+                        return;
+                    }
+
+                    data.books.forEach(book => {
+                        const card = document.createElement('div');
+                        card.className = 'col-md-4 mb-4';
+                        card.setAttribute('data-aos', 'fade-up');
+                        card.innerHTML = `
+                            <div class="book-card">
+                                <div class="book-img">
+                                    <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}">
+                                </div>
+                                <div class="book-status status-${book.status.toLowerCase()}">${book.status.replace('_', ' ')}</div>
+                                <div class="p-3">
+                                    <h5>${book.title}</h5>
+                                    <p class="text-muted" data-i18n="catalog.authors">${translations[savedLanguage].catalog.authors}: ${book.authors.join(', ')}</p>
+                                    <p class="text-muted" data-i18n="catalog.isbn">${translations[savedLanguage].catalog.isbn}: ${book.isbn}</p>
+                                    <button class="btn btn-reserve" data-book-id="${book.id}" ${book.status !== 'AVAILABLE' ? 'disabled' : ''} data-i18n="catalog.reserve">Reserve</button>
+                                </div>
+                            </div>
+                        `;
+                        bookList.appendChild(card);
+                    });
+
+                    loadMoreBtn.style.display = data.hasMore ? 'block' : 'none';
+                    page++;
+                    AOS.refresh();
+                } catch (error) {
+                    console.error('Error fetching books:', error);
+                    bookList.innerHTML = '<p class="text-center">Error loading books.</p>';
+                } finally {
+                    isLoading = false;
+                }
+            };
+
+            const fetchSuggestions = async (query) => {
+                if (!query) {
+                    searchSuggestions.classList.remove('show');
+                    return;
+                }
+                try {
+                    const response = await fetch(`http://localhost:5000/api/search/suggestions?query=${encodeURIComponent(query)}`);
+                    const suggestions = await response.json();
+                    searchSuggestions.innerHTML = suggestions.map(s => `
+                        <div class="search-suggestion-item" role="option">${s}</div>
+                    `).join('');
+                    searchSuggestions.classList.add('show');
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                }
+            };
+
+            searchInput.addEventListener('input', () => {
+                fetchSuggestions(searchInput.value);
+                fetchBooks(true);
+            });
+
+            searchSuggestions.addEventListener('click', (e) => {
+                if (e.target.classList.contains('search-suggestion-item')) {
+                    searchInput.value = e.target.textContent;
+                    searchSuggestions.classList.remove('show');
+                    fetchBooks(true);
+                }
+            });
+
+            document.querySelector('.btn-search').addEventListener('click', () => fetchBooks(true));
+            statusFilter.addEventListener('change', () => fetchBooks(true));
+            languageFilter.addEventListener('change', () => fetchBooks(true));
+            loadMoreBtn.addEventListener('click', () => fetchBooks());
+
+            document.addEventListener('click', (e) => {
+                if (!searchSuggestions.contains(e.target) && e.target !== searchInput) {
+                    searchSuggestions.classList.remove('show');
+                }
+            });
+
+            bookList.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('btn-reserve')) {
+                    const bookId = e.target.getAttribute('data-book-id');
+                    const user = JSON.parse(localStorage.getItem('user')); // Assume user is stored after login
+                    if (!user) {
+                        alert(translations[savedLanguage].catalog.loginPrompt);
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('http://localhost:5000/api/reservations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: user.id, bookId })
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                            alert('Reservation requested successfully!');
+                            fetchBooks(true);
+                        } else if (result.error === 'Reservation limit reached') {
+                            alert(translations[savedLanguage].catalog.limitReached);
+                        } else if (result.error === 'Book not available') {
+                            alert(translations[savedLanguage].catalog.notAvailable);
+                        } else {
+                            alert('Error reserving book.');
+                        }
+                    } catch (error) {
+                        console.error('Error reserving book:', error);
+                        alert('Error reserving book.');
+                    }
+                }
+            });
+
+            // Initial load
+            fetchBooks();
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = anchor.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        function applyLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = translations[lang];
+                for (const k of keys) {
+                    value = value?.[k];
+                    if (!value) break;
+                }
+                if (value) {
+                    if (element.tagName === 'INPUT' && key.includes('[placeholder]')) {
+                        element.placeholder = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            });
+            document.title = translations[lang].title;
+        }
+    </script>
+</body>
+</html>

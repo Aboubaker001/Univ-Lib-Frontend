@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">University Library | Contact Us</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+    <style>
+        /* Extend main.css styles */
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #6d28d9;
+            --accent-color: #f59e0b;
+            --light-color: #f8fafc;
+            --dark-color: #0f172a;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #ffffff;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --footer-bg: #1e40af;
+            --footer-text: #f8fafc;
+            --input-bg: #f1f5f9;
+            --input-border: #cbd5e1;
+            --glass-blur: 12px;
+            --border-radius: 10px;
+            --transition: all 0.3s ease-in-out;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        html[dir="rtl"] {
+            font-family: "Noto Sans Arabic", sans-serif;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(109, 40, 217, 0.85)),
+                url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3");
+            background-size: cover;
+            background-position: center;
+            padding: 120px 0 80px;
+            min-height: 50vh;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .contact-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+
+        .btn-submit {
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:focus {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+            outline: none;
+        }
+
+        .map-container {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            height: 400px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-color);
+            color: var(--white);
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--accent-color);
+        }
+
+        .section-py {
+            padding: 60px 0;
+        }
+
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--white) !important;
+        }
+
+        .footer-main {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 60px 0;
+        }
+
+        @media (max-width: 767px) {
+            .hero-section {
+                padding: 80px 0 60px;
+                min-height: 40vh;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .map-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="fixed-header">
+        <div class="header-top-bar">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="tel:+213-32-11-22-33"><i class="fas fa-phone-alt me-2"></i>+213-32-11-22-33</a>
+                        <a href="mailto:library@univ-eloued.dz" class="ms-4"><i class="fas fa-envelope me-2"></i>library@univ-eloued.dz</a>
+                    </div>
+                    <div class="language-selector">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="language-text">EN</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-us me-2"></span>English</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-dz me-2"></span>العربية</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav.home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav.resources">Resources</a></li>
+                        <li class="nav-item"><a class="nav-item"><a class="nav-link" href="#" data-i18n="nav.services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search-guide.html" data-i18n="nav.searchGuide">Search Guide</a></li>
+                        <li class="nav-item"><a class="nav-link" href="catalog.html" data-i18n="nav.catalog">Catalog</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="contact.html" data-i18n="nav.contact">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="login.html" data-i18n="nav.login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title" data-i18n="hero.title">Get in Touch</h1>
+            <p class="hero-subtitle" data-i18n="hero.subtitle">We're here to assist you with all your library needs.</p>
+        </div>
+    </section>
+
+    <section class="contact-section section-py">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4" data-aos="fade-right">
+                    <h2 class="mb-4" data-i18n="contact.form.title">Send Us a Message</h2>
+                    <form id="contactForm" novalidate>
+                        <div class="mb-3">
+                            <label for="name" class="form-label" data-i18n="contact.form.name">Name</label>
+                            <input type="text" class="form-control" id="name" required data-i18n="[placeholder]contact.form.namePlaceholder">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label" data-i18n="contact.form.email">Email</label>
+                            <input type="email" class="form-control" id="email" required data-i18n="[placeholder]contact.form.emailPlaceholder">
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label" data-i18n="contact.form.subject">Subject</label>
+                            <input type="text" class="form-control" id="subject" required data-i18n="[placeholder]contact.form.subjectPlaceholder">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label" data-i18n="contact.form.message">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required data-i18n="[placeholder]contact.form.messagePlaceholder"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-submit" data-i18n="contact.form.submit">Send Message</button>
+                    </form>
+                </div>
+                <div class="col-lg-6 mb-4" data-aos="fade-left">
+                    <h2 class="mb-4" data-i18n="contact.info.title">Contact Information</h2>
+                    <div class="contact-card mb-3">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
+                        <h4 data-i18n="contact.info.address.title">Address</h4>
+                        <p data-i18n="contact.info.address.value">El Oued University, PO Box 789, El Oued 39000, Algeria</p>
+                    </div>
+                    <div class="contact-card mb-3">
+                        <i class="fas fa-phone-alt contact-icon"></i>
+                        <h4 data-i18n="contact.info.phone.title">Phone</h4>
+                        <p><a href="tel:+213-32-11-22-33">+213-32-11-22-33</a></p>
+                    </div>
+                    <div class="contact-card mb-3">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <h4 data-i18n="contact.info.email.title">Email</h4>
+                        <p><a href="mailto:library@univ-eloued.dz">library@univ-eloued.dz</a></p>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-clock contact-icon"></i>
+                        <h4 data-i18n="contact.info.hours.title">Library Hours</h4>
+                        <p data-i18n="contact.info.hours.value">Sunday - Thursday: 8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="map-section section-py bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5" data-i18n="map.title">Find Us on the Map</h2>
+            <div class="map-container" data-aos="zoom-in">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3326.373171309017!2d6.856928315202299!3d33.36728998079847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12594e7b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sUniversit%C3%A9%20d%27El%20Oued!5e0!3m2!1sen!2sdz!4v1698765432109!5m2!1sen!2sdz" width="100%" height="100%" allowfullscreen="" title="google-map"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <a class="footer-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
+                    <p class="footer-about mt-3" data-i18n="footer.about">Providing world-class resources and services since 1965.</p>
+                    <div class="footer-social mt-3">
+                        <a href="https://facebook.com/univeloued" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com/univeloued" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://youtube.com/univeloued" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h4 class="footer-title" data-i18n="footer.quickLinks.title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html" data-i18n="footer.quickLinks.home">Home</a></li>
+                        <li><a href="catalog.html" data-i18n="footer.quickLinks.catalog">Library Catalog</a></li>
+                        <li><a href="search-guide.html" data-i18n="footer.quickLinks.searchGuide">Search Guide</a></li>
+                        <li><a href="contact.html" data-i18n="footer.quickLinks.contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h4 class="footer-title" data-i18n="footer.contact.title">Contact Us</h4>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="footer.contact.address">El Oued University, PO Box 789, El Oued 39000, Algeria</span></p>
+                        <p><i class="fas fa-phone-alt me-2"></i>+213-32-11-22-33</p>
+                        <p><i class="fas fa-envelope me-2"></i>library@univ-eloued.dz</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        const translations = {
+            en: {
+                title: "University Library | Contact Us",
+                nav: {
+                    home: "Home",
+                    resources: "Resources",
+                    services: "Services",
+                    searchGuide: "Search Guide",
+                    catalog: "Catalog",
+                    contact: "Contact",
+                    login: "Login"
+                },
+                hero: {
+                    title: "Get in Touch",
+                    subtitle: "We're here to assist you with all your library needs."
+                },
+                contact: {
+                    form: {
+                        title: "Send Us a Message",
+                        name: "Name",
+                        namePlaceholder: "Enter your name",
+                        email: "Email",
+                        emailPlaceholder: "Enter your email",
+                        subject: "Subject",
+                        subjectPlaceholder: "Enter the subject",
+                        message: "Message",
+                        messagePlaceholder: "Enter your message",
+                        submit: "Send Message",
+                        success: "Message sent successfully!",
+                        error: "Error sending message. Please try again."
+                    },
+                    info: {
+                        title: "Contact Information",
+                        address: {
+                            title: "Address",
+                            value: "El Oued University, PO Box 789, El Oued 39000, Algeria"
+                        },
+                        phone: {
+                            title: "Phone",
+                            value: "+213-32-11-22-33"
+                        },
+                        email: {
+                            title: "Email",
+                            value: "library@univ-eloued.dz"
+                        },
+                        hours: {
+                            title: "Library Hours",
+                            value: "Sunday - Thursday: 8:00 AM - 5:00 PM"
+                        }
+                    }
+                },
+                map: {
+                    title: "Find Us on the Map"
+                },
+                footer: {
+                    about: "Providing world-class resources and services since 1965.",
+                    quickLinks: {
+                        title: "Quick Links",
+                        home: "Home",
+                        catalog: "Library Catalog",
+                        searchGuide: "Search Guide",
+                        contact: "Contact"
+                    },
+                    contact: {
+                        title: "Contact Us",
+                        address: "El Oued University, PO Box 789, El Oued 39000, Algeria"
+                    }
+                }
+            },
+            ar: {
+                title: "مكتبة الجامعة | اتصل بنا",
+                nav: {
+                    home: "الرئيسية",
+                    resources: "الموارد",
+                    services: "الخدمات",
+                    searchGuide: "دليل البحث",
+                    catalog: "الكتالوج",
+                    contact: "اتصل بنا",
+                    login: "تسجيل الدخول"
+                },
+                hero: {
+                    title: "تواصل معنا",
+                    subtitle: "نحن هنا لمساعدتك في جميع احتياجات المكتبة الخاصة بك."
+                },
+                contact: {
+                    form: {
+                        title: "أرسل لنا رسالة",
+                        name: "الاسم",
+                        namePlaceholder: "أدخل اسمك",
+                        email: "البريد الإلكتروني",
+                        emailPlaceholder: "أدخل بريدك الإلكتروني",
+                        subject: "الموضوع",
+                        subjectPlaceholder: "أدخل الموضوع",
+                        message: "الرسالة",
+                        messagePlaceholder: "أدخل رسالتك",
+                        submit: "إرسال الرسالة",
+                        success: "تم إرسال الرسالة بنجاح!",
+                        error: "خطأ في إرسال الرسالة. حاول مرة أخرى."
+                    },
+                    info: {
+                        title: "معلومات الاتصال",
+                        address: {
+                            title: "العنوان",
+                            value: "جامعة الوادي، ص.ب 789، الوادي 39000، الجزائر"
+                        },
+                        phone: {
+                            title: "الهاتف",
+                            value: "+213-32-11-22-33"
+                        },
+                        email: {
+                            title: "البريد الإلكتروني",
+                            value: "library@univ-eloued.dz"
+                        },
+                        hours: {
+                            title: "ساعات عمل المكتبة",
+                            value: "الأحد - الخميس: 8:00 صباحًا - 5:00 مساءً"
+                        }
+                    }
+                },
+                map: {
+                    title: "ابحث عنا على الخريطة"
+                },
+                footer: {
+                    about: "توفير موارد وخدمات عالمية المستوى منذ عام 1965.",
+                    quickLinks: {
+                        title: "روابط سريعة",
+                        home: "الرئيسية",
+                        catalog: "كتالوج المكتبة",
+                        searchGuide: "دليل البحث",
+                        contact: "اتصل بنا"
+                    },
+                    contact: {
+                        title: "اتصل بنا",
+                        address: "جامعة الوادي، ص.ب 789، الوادي 39000، الجزائر"
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({ duration: 800, easing: 'ease-out-quart', once: true });
+
+            // Initialize language
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            applyLanguage(savedLanguage);
+            document.documentElement.lang = savedLanguage;
+            document.documentElement.setAttribute('dir', savedLanguage === 'ar' ? 'rtl' : 'ltr');
+            document.querySelector('.language-text').textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
+
+            // Language selector
+            document.querySelectorAll('.language-selector .dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const selectedLang = item.getAttribute('data-lang');
+                    localStorage.setItem('language', selectedLang);
+                    applyLanguage(selectedLang);
+                    document.documentElement.lang = selectedLang;
+                    document.documentElement.setAttribute('dir', selectedLang === 'ar' ? 'rtl' : 'ltr');
+                    document.querySelector('.language-text').textContent = selectedLang === 'ar' ? 'AR' : 'EN';
+                    document.querySelectorAll('.dropdown-item').forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
+                });
+            });
+
+            // Form handling
+            const contactForm = document.getElementById('contactForm');
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!contactForm.checkValidity()) {
+                    contactForm.classList.add('was-validated');
+                    return;
+                }
+
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('message').value
+                };
+
+                try {
+                    const response = await fetch('http://localhost:5000/api/contact', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    if (response.ok) {
+                        alert(translations[savedLanguage].contact.form.success);
+                        contactForm.reset();
+                        contactForm.classList.remove('was-validated');
+                    } else {
+                        alert(translations[savedLanguage].contact.form.error);
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert(translations[savedLanguage].contact.form.error);
+                }
+            });
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = anchor.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        function applyLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = translations[lang];
+                for (const k of keys) {
+                    value = value?.[k];
+                    if (!value) break;
+                }
+                if (value) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        if (key.includes('[placeholder]')) {
+                            element.placeholder = value;
+                        } else {
+                            element.textContent = value;
+                        }
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            });
+            document.title = translations[lang].title;
+        }
+    </script>
+</body>
+</html>

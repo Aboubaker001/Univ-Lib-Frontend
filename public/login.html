@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - University Library</title>
+  <link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      <div class="col-md-6 bg-image d-none d-md-flex align-items-center justify-content-center">
+            <div class="lang-toggle">
+        <button class="btn btn-outline-primary lang-btn active" data-lang="en">EN</button>
+        <button class="btn btn-outline-primary lang-btn" data-lang="ar">AR</button>
+    </div>
+        <div class="illustration-container">
+          <img src="./img/illus-pic-ar.png" id="illus-ar" class="illustration ar d-none" alt="Illustration" title="Illustration">
+          <img src="./img/illus-pic-en.png" id="illus-en" class="illustration en active" alt="Illustration" title="Illustration">
+        </div>
+      </div>
+      <div class="col-md-6 d-flex align-items-center justify-content-center">
+        <div class="auth-container">
+          <div id="login-form" class="auth-form">
+            <img src="./img/library-logo.png" alt="Library Logo" class="logo">
+            <h2 class="text-center logo-text" data-i18n="universityLibrary">University Library</h2>
+            <h2 class="text-center" data-i18n="login">Login</h2>
+            <form id="loginForm">
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="loginInput" required data-i18n-placeholder="email" placeholder="Email" title="Email">
+                <label data-i18n="email">Email</label>
+              </div>
+              <div class="form-floating mb-3 position-relative">
+                <input type="password" class="form-control pe-5" id="loginPassword" required data-i18n-placeholder="password" placeholder="Password" title="Password">
+                <label data-i18n="password">Password</label>
+                <button type="button" class="btn show-password-btn" data-target="loginPassword" aria-label="Show password" data-i18n-aria-label="showPassword">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="login">Login</button>
+              <p class="text-center">
+                <a href="#" class="show-register" data-i18n="registerLink">Don't have an account? Register</a>
+              </p>
+            </form>
+          </div>
+          <div id="register-form" class="auth-form d-none">
+            <img src="./img/library-logo.png" alt="Library Logo" class="logo">
+            <h2 class="text-center logo-text" data-i18n="universityLibrary">University Library</h2>
+            <h2 class="text-center" data-i18n="register">Register</h2>
+            <form id="registerForm">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="firstName" required data-i18n-placeholder="firstName" placeholder="First Name" title="First Name">
+                    <label data-i18n="firstName">First Name</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="familyName" required data-i18n-placeholder="familyName" placeholder="Family Name" title="Family Name">
+                    <label data-i18n="familyName">Family Name</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="studentId" required data-i18n-placeholder="studentId" placeholder="Student ID" title="Student ID">
+                <label data-i18n="studentId">Student ID</label>
+              </div>
+              <div class="mb-3">
+                <input type="file" class="form-control" id="idCard" accept="image/*" title="Upload Student ID Card (optional)" placeholder="Upload Student ID Card (optional)">
+                <label data-i18n="idCard">Upload Student ID Card (optional)</label>
+              </div>
+              <div class="form-floating mb-3">
+                <label for="faculty" data-i18n="faculty" class="form-label">Faculty</label>
+                <select class="form-select" id="faculty" required title="Faculty">
+                  <option value="" disabled selected data-i18n="selectFaculty">Select Faculty</option>
+                  <option value="Science and Technology">Faculty of Science and Technology</option>
+                  <option value="Exact Sciences">Faculty of Exact Sciences</option>
+                  <option value="Humanities and Social Sciences">Faculty of Humanities and Social Sciences</option>
+                  <option value="Economic Sciences">Faculty of Economic, Commercial, and Management Sciences</option>
+                  <option value="Law and Political Sciences">Faculty of Law and Political Sciences</option>
+                  <option value="Arts and Languages">Faculty of Arts and Languages</option>
+                  <option value="Islamic Sciences">Faculty of Islamic Sciences</option>
+                  <option value="Natural and Life Sciences">Faculty of Natural and Life Sciences</option>
+                </select>
+              </div>
+              <div class="form-floating mb-3">
+                <select class="form-select" id="academicYear" required title="Academic Year">
+                  <option value="" disabled selected data-i18n="selectYear">Select Year</option>
+                  <option value="L1">1st Year (L1)</option>
+                  <option value="L2">2nd Year (L2)</option>
+                  <option value="L3">3rd Year (L3)</option>
+                  <option value="M1">4th Year (M1)</option>
+                  <option value="M2">5th Year (M2)</option>
+                  <option value="D">Final years (D)</option>
+                </select>
+                <label data-i18n="academicYear">Academic Year</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="major" required data-i18n-placeholder="major" placeholder="Major" title="Major">
+                <label data-i18n="major">Major</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="email" required data-i18n-placeholder="email" placeholder="E-mail" title="E-mail">
+                <label data-i18n="email">E-mail</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="phoneNumber" required data-i18n-placeholder="phone" placeholder="Phone" title="Phone">
+                <label data-i18n="phone">Phone</label>
+              </div>
+              <div class="form-floating mb-3 position-relative">
+                <input type="password" class="form-control" id="registerPassword" required data-i18n-placeholder="password" placeholder="Password" title="Password">
+                <label data-i18n="password">Password</label>
+                <button type="button" class="btn btn-outline-secondary show-password-btn" data-target="registerPassword" aria-label="Show password" data-i18n-aria-label="showPassword">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <div class="password-strength"><div class="password-strength-bar"></div></div>
+                <small class="form-text text-muted" data-i18n="passwordHint">Password must be at least 8 characters</small>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="register">Register</button>
+              <p class="text-center">
+                <a href="#" class="show-login" data-i18n="loginLink">Already have an account? Login</a>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/i18next@21.6.14/dist/umd/i18next.min.js"></script>
+<script src="./js/login.js"></script>
+<script>
+  console.log('Test script loaded at', new Date().toISOString());
+  document.querySelectorAll('.show-password-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      console.log('TEST: Clicked button:', button.id);
+      alert('Test: Button clicked - ' + button.id);
+    });
+  });
+</script>
+</body>
+</html>

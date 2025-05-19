@@ -1,0 +1,110 @@
+/* Base styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  overflow-x: hidden;
+  color: #333;
+}
+
+/* Sidebar styling */
+#sidebar {
+  width: 16rem;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  z-index: 1030;
+}
+
+#sidebar ul {
+  padding-left: 0;
+}
+
+#sidebar ul li {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+#sidebar ul li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #4f46e5; /* Indigo-600 */
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#sidebar ul li a i {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+#sidebar ul li a:hover,
+#sidebar ul li a.active {
+  background-color: #4338ca; /* Indigo-700 */
+  color: white;
+}
+
+/* Page content wrapper */
+#page-content-wrapper {
+  margin-left: 16rem;
+  min-height: 100vh;
+  background: #f0f4f8;
+  transition: margin-left 0.3s ease;
+}
+
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.navbar .btn-primary {
+  background-color: #4f46e5;
+  border: none;
+}
+
+.navbar .btn-primary:hover {
+  background-color: #4338ca;
+}
+
+/* Dashboard cards */
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+/* Card titles */
+.card h5 {
+  color: #4f46e5;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 1040;
+  }
+  #sidebar.active {
+    transform: translateX(0);
+  }
+  #page-content-wrapper {
+    margin-left: 0;
+  }
+}

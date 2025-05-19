@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librarian Dashboard - Univ Library</title>
+  <link rel="stylesheet" href="../css//dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <img src="../img/library-logo.png" alt="Library Logo" class="logo">
+      <span class="admin" data-i18n="librarySystem">Library System</span>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="sidebar-menu">
+        <li class="active"><a href="./librarian-dashboard.html"><i class="fas fa-tachometer-alt"></i><span data-i18n="dashboard">Dashboard</span></a></li>
+        <li><a href="./admin-students.html"><i class="fas fa-users"></i><span data-i18n="manageStudents">Manage Students</span></a></li>
+        <li><a href="./admin-books.html"><i class="fas fa-book"></i><span data-i18n="manageBooks">Manage Books</span></a></li>
+        <li><a href="./admin-reservations.html"><i class="fas fa-calendar-check"></i><span data-i18n="manageReservations">Manage Reservations</span></a></li>
+        <li><a href="./librarian-fines.html"><i class="fas fa-money-bill"></i><span data-i18n="manageFines">Manage Fines</span></a></li>
+        <li><a href="./home.html"><i class="fas fa-home"></i><span data-i18n="homepage">Homepage</span></a></li>
+        <li><a href="#" id="logout"><i class="fas fa-sign-out-alt"></i><span data-i18n="logout">Logout</span></a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="language-toggle" class="btn btn-sm btn-outline-light">EN</button>
+    </div>
+  </aside>
+
+  <!-- Toggle Button -->
+  <button id="toggle-btn" class="toggle-btn" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+
+  <!-- Main Content -->
+  <main id="main-content" class="main-content">
+    <div class="container-fluid">
+      <!-- Welcome Section -->
+      <div class="card animate-slide-up">
+        <div class="card-header">
+          <h3 class="card-title" data-i18n="welcomeLibrarian">Welcome, Librarian</h3>
+        </div>
+        <div class="card-body">
+          <p data-i18n="librarianOverview">Manage students, books, reservations, and fines from this dashboard.</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card animate-slide-up">
+        <div class="card-header">
+          <h4 class="card-title" data-i18n="quickActions">Quick Actions</h4>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-3">
+            <a href="./admin-students.html" class="btn btn-primary"><i class="fas fa-user-plus"></i> <span data-i18n="addStudent">Add Student</span></a>
+            <a href="./admin-books.html" class="btn btn-primary"><i class="fas fa-book"></i> <span data-i18n="addBook">Add Book</span></a>
+            <a href="./admin-reservations.html" class="btn btn-primary"><i class="fas fa-calendar-check"></i> <span data-i18n="viewReservations">View Reservations</span></a>
+            <a href="./librarian-fines.html" class="btn btn-primary"><i class="fas fa-money-bill"></i> <span data-i18n="manageFines">Manage Fines</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://unpkg.com/i18next@21.6.14/dist/umd/i18next.min.js"></script>
+  <script src="https://unpkg.com/i18next-browser-languagedetector@6.1.2/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
+  <script src="../js/control-dashboard.js"></script>
+</body>
+</html>

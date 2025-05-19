@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borrow Book - University Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/student.css">
+  <script src="https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="../main/index.html">
+        <img src="../img/library-logo.png" alt="University Library Logo">
+        <span data-i18n="libraryTitle">University Library</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="../student/home-student.html" data-i18n="home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="../student/student-books.html" data-i18n="browseBooks">Browse Books</a></li>
+          <li class="nav-item"><a class="nav-link" href="../student/my-reservations.html" data-i18n="myReservations">My Reservations</a></li>
+          <li class="nav-item"><a class="nav-item"><a class="nav-link" href="../student/my-fines.html" data-i18n="myFines">My Fines</a></li>
+          <li class="nav-item"><a class="nav-link" href="../student/student-profile.html" data-i18n="profile">Profile</a></li>
+          <li class="nav-item"><a class="nav-link active" href="../student/student-borrow.html" data-i18n="borrowBook">Borrow Book</a></li>
+          <li class="nav-item"><a class="nav-link logout-btn" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-1"></i><span data-i18n="logout">Logout</span></a></li>
+          <li class="nav-item"><button class="lang-toggle-btn" id="langToggleBtn">AR</button></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Borrow Book Form -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card animate-fade-up">
+          <div class="card-body">
+            <h3 data-i18n="borrowBook">Borrow Book</h3>
+            <form id="borrow-book-form" class="row g-3">
+              <div class="input-group">
+                  <input type="text" id="bookSearch" class="form-control" placeholder="Search by title, author, ISBN, or keyword..." data-i18n="[placeholder]searchPlaceholder">
+                  <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="filterBtn" data-i18n="filter">Filter</button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="title" data-i18n="bookTitle">Title</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="author" data-i18n="author">Author</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="isbn" data-i18n="isbn">ISBN</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="keyword" data-i18n="keyword">Keyword</a></li>
+                  </ul>
+                  <button type="button" class="btn btn-outline-danger" id="clearSearch" title="Clear Search"><i class="fas fa-times"></i></button>
+              </div>
+              <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100" data-i18n="borrowBook">Borrow Book</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Borrow Requests Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card animate-fade-up">
+          <div class="card-body">
+            <h4 data-i18n="pendingRequests">Pending Requests</h4>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th data-i18n="bookTitle">Book Title</th>
+                    <th class="sortable" data-sort="requestDate" data-i18n="requestDate">Request Date <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-sort="status" data-i18n="status">Status <i class="fas fa-sort"></i></th>
+                    <th data-i18n="actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="request-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Borrow Modal -->
+  <div class="modal fade" id="confirmBorrowModal" tabindex="-1" aria-labelledby="confirmBorrowModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmBorrowModalLabel" data-i18n="confirmBorrow">Confirm Borrow Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmBorrowDetails" data-i18n="confirmBorrowDetails">Are you sure you want to borrow this book?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+          <button type="button" id="confirmBorrowBtn" class="btn btn-primary" data-i18n="confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Request Modal -->
+  <div class="modal fade" id="editRequestModal" tabindex="-1" aria-labelledby="editRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editRequestModalLabel" data-i18n="edit">Edit Borrow Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-request-form">
+            <div class="mb-3">
+              <label for="edit-bookId" class="form-label" data-i18n="selectBook">Select Book</label>
+              <select id="edit-bookId" class="form-select" required></select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+          <button type="submit" form="edit-request-form" class="btn btn-primary" data-i18n="confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/student-script.js"></script>

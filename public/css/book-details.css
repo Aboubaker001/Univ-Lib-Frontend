@@ -1,0 +1,100 @@
+/* Book Details Specific Styles */
+.book-details-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--student-neutral);
+  box-shadow: var(--shadow-md);
+}
+
+.book-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px 0 0 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-cover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  color: var(--student-primary);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.card-text strong {
+  color: var(--student-primary);
+}
+
+.badge-success {
+  background: var(--student-secondary);
+}
+
+.badge-danger {
+  background: #DC3545;
+}
+
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal-content {
+  border-radius: 12px;
+}
+
+.modal-header {
+  background: var(--student-primary);
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .book-details-card {
+    flex-direction: column;
+  }
+  .book-cover {
+    border-radius: 16px 16px 0 0;
+    max-height: 400px;
+  }
+  .card-title {
+    font-size: 1.5rem;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* RTL Support */
+body[lang="ar"] .book-details-card {
+  direction: rtl;
+}
+body[lang="ar"] .card-text strong {
+  margin-left: 0.5rem;
+}

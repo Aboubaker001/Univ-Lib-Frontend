@@ -1,0 +1,348 @@
+:root {
+  --primary: #1a3c6e;
+  --secondary: #d4a017;
+  --light: #f4f7fa;
+  --dark: #0f1c30;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease-in-out;
+  --danger: #dc3545;
+  --success: #28a745;
+  --warning: #fd7e14;
+}
+
+body {
+  background: linear-gradient(135deg, #f4f7fa 0%, #e8f0f8 100%);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  direction: ltr;
+}
+
+.auth-container {
+  max-width: 500px;
+  width: 100%;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  z-index: 1;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212,160,23,0.1) 0%, rgba(26,60,110,0.05) 70%);
+  z-index: -1;
+  animation: rotateGradient 10s linear infinite;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 15px rgba(26, 60, 110, 0.2);
+  border: 2px solid white;
+  transition: var(--transition);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(26, 60, 110, 0.25);
+}
+
+.logo-text {
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 8px;
+  display: block;
+}
+
+.auth-form {
+  transition: var(--transition);
+}
+
+.auth-form h2 {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.auth-form h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.form-floating {
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 5; /* Lower than show-password-btn */
+}
+
+.form-floating > label {
+  z-index: 10;
+  pointer-events: none;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  height: auto;
+  transition: var(--transition);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 0.2rem rgba(212, 160, 23, 0.2);
+  transform: translateY(-1px);
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+  border-color: var(--danger);
+}
+
+.form-control.is-invalid:focus, .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.password-strength {
+  height: 4px;
+  background: #e9ecef;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.password-strength.weak .password-strength-bar {
+  width: 30%;
+  background: var(--danger);
+}
+
+.password-strength.medium .password-strength-bar {
+  width: 60%;
+  background: var(--warning);
+}
+
+.password-strength.strong .password-strength-bar {
+  width: 100%;
+  background: var(--success);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  box-shadow: 0 3px 10px rgba(26, 60, 110, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(212, 160, 23, 0.3);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.4s;
+}
+
+.btn-primary:hover::after {
+  left: 100%;
+}
+
+.show-password-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  color: var(--dark);
+  font-size: 1rem;
+  line-height: 1;
+  transition: var(--transition);
+  z-index: 30; /* Increased to avoid overlap */
+  pointer-events: auto;
+  cursor: pointer;
+  /* Temporary visual feedback for debugging */
+  border: 1px solid transparent;
+}
+
+.show-password-btn:hover {
+  color: var(--secondary);
+  transform: translateY(-50%) scale(1.1);
+  border-color: var(--secondary); /* Visual feedback */
+}
+
+.show-password-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(212, 160, 23, 0.25);
+  border-color: var(--primary); /* Visual feedback */
+}
+
+.bg-image {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.illustration-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.illustration {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  opacity: 0;
+  filter: drop-shadow(0 8px 15px rgba(0,0,0,0.2));
+  transition: all 0.5s ease-in-out;
+}
+
+.illustration.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.lang-toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+.lang-btn {
+  border-radius: 15px;
+  padding: 0.25rem 0.75rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.lang-btn.active {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: #fff;
+}
+
+.lang-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(212, 160, 23, 0.25);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes rotateGradient {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* RTL specific styles */
+body[dir="rtl"] .auth-form h2::after {
+  left: auto;
+  right: 0;
+}
+
+body[dir="rtl"] .show-password-btn {
+  right: auto;
+  left: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .illustration {
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
