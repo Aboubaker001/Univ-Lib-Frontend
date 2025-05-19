@@ -1,14 +1,20 @@
 [build]
-  base = ""
-  publish = "."
+  publish = "public"
   command = ""
 
+# Serve index.html at /
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+# Redirect non-existent routes to login.html (optional)
 [[redirects]]
   from = "/*"
   to = "/login.html"
-  status = 200
-  force = false
+  status = 404
 
+# Optional: force redirect for specific paths
 [[redirects]]
   from = "/admin-librarian/login.html"
   to = "/login.html"
