@@ -1,9 +1,16 @@
 [build]
-  base = "frontend"
-  publish = "frontend/public"
+  base = ""
+  publish = "."
   command = ""
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/login.html"
   status = 200
+  force = false
+
+[[redirects]]
+  from = "/admin-librarian/login.html"
+  to = "/login.html"
+  status = 301
+  force = true
