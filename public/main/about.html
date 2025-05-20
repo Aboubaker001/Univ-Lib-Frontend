@@ -5,65 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="About UniLibrary at El Oued University" />
   <title data-i18n="title">UniLibrary | About Us</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/css/glide.core.min.css">
+    <!-- Glide.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@glidejs/glide@3.6.0/dist/css/glide.core.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Main CSS -->
     <link rel="stylesheet" href="../css/main.css">
+    <!-- Preconnect to CDNs for better performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 </head>
 <body>
-  <!-- Header -->
-    <!-- Navigation -->
     <header class="fixed-header">
-        <div class="header-top-bar bg-dark">
+        <div class="header-top-bar">
             <div class="container">
-                <div class="d-flex justify-content-between align-items-center py-2">
-                    <div class="header-contact">
-                        <a href="tel:+1234567890" class="text-white me-3"><i class="fas fa-phone-alt me-1"></i> (123) 456-7890</a>
-                        <a href="mailto:info@unilibrary.edu" class="text-white"><i class="fas fa-envelope me-1"></i> info@unilibrary.edu</a>
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <span><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</span>
+                        <span class="ms-3"><i class="fas fa-envelope me-2"></i>info@unilibrary.com</span>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <div class="dropdown language-selector">
-                            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-globe me-1"></i> <span class="language-text">EN</span>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="language-selector dropdown d-inline-block">
+                            <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="language-text">EN</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-gb me-2"></span>English</a></li>
-                                <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-sa me-2"></span>العربية</a></li>
+                            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <nav class="navbar navbar-expand-lg">
             <div class="container">
-                    <i class="fas fa-book-open me-2"></i>
-                    <span class="brand-text">
-                        <span class="brand-main">Uni</span><span class="brand-accent">Library</span>
-                    </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <a href="../index.html"><img  src="../img/library-logo.png" alt="Library Logo" class="logo"></a>
+                <a class="navbar-brand" href="../index.html"><span class="brand-main"> Uni</span><span class="brand-accent">Library</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="mainNav">
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="../services.html"><i class="fas fa-concierge-bell me-1 d-lg-none"></i> <span data-i18n="nav.services">Services</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="../main/search-guide.html"><i class="fas fa-search me-1 d-lg-none"></i> <span data-i18n="nav.researchHelp">Research Help</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="../main/about.html"><i class="fas fa-info-circle me-1 d-lg-none"></i> <span data-i18n="nav.about">About</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="../main/contact.html"><i class="fas fa-envelope me-1 d-lg-none"></i> <span data-i18n="nav.contact">Contact</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="./services.html" data-i18n="nav.services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./search-guide.html" data-i18n="nav.researchHelp">Research Help</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./about.html" data-i18n="nav.about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./contact.html" data-i18n="nav.contact">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" id="authButton" href="../login.html" data-i18n="nav.login">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" id="dashboardButton" href="../student/student-dashboard.html" data-i18n="nav.dashboard">Dashboard</a></li>
                     </ul>
-                    <div class="ms-lg-3 mt-3 mt-lg-0">
-                        <a href="./login.html" class="btn btn-outline-light me-2"><i class="fas fa-sign-in-alt me-1"></i> <span data-i18n="nav.login">Login</span></a>
-                        <a href="../main/search-guide.html" class="btn btn-accent btn-glow"><i class="fas fa-search me-1"></i> <span data-i18n="nav.quickSearch">Quick Search</span></a>
-                    </div>
                 </div>
             </div>
         </nav>
     </header>
-
   <!-- Hero Section -->
   <section class="hero-section about-hero">
     <div class="container text-center">
@@ -77,10 +75,10 @@
   <section id="about" class="section-py">
     <div class="container">
       <div class="row align-items-center">
-        <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
-          <img src="img/library-about.jpg" alt="UniLibrary Interior" class="img-fluid rounded shadow-lg" />
-        </div>
+          <img src="../img/library-intro.gif" alt="UniLibrary Interior" width="90%" height="90%" />
+          <br>
         <div class="col-lg-6" data-aos="fade-left">
+          <br>
           <h2 class="section-title" data-i18n="about.title">Our History & Mission</h2>
           <p class="section-text" data-i18n="about.history">
             Established in 1995 alongside El Oued University, UniLibrary has grown into a cornerstone of academic excellence in southeastern Algeria. With over 250,000 resources, including books, journals, and digital archives, we support students, faculty, and researchers across disciplines.
@@ -88,126 +86,211 @@
           <p class="section-text" data-i18n="about.mission">
             Our mission is to foster a culture of learning and innovation by providing access to world-class resources, cutting-edge technology, and collaborative spaces. We are committed to empowering the university community and beyond.
           </p>
-          <a href="../main/services.html" class="btn btn-secondary btn-glow" data-i18n="about.services">Discover Our Services</a>
+          <a href="./services.html" class="btn btn-secondary btn-glow" data-i18n="about.services">Discover Our Services</a>
         </div>
+       </div>
       </div>
     </div>
   </section>
+    <!-- Services Section -->
+    <section class="section-py" id="services">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 data-i18n="about.services">Discover Our Services</h2>
+                <p class="lead" data-i18n="about.servicesSubtitle">Comprehensive resources to support your academic journey</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="fade-up">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3 data-i18n="about.services.books">Book Collections</h3>
+                        <p data-i18n="about.services.booksText">Over 150,000 physical volumes across all disciplines</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <h3 data-i18n="about.services.digital">Digital Resources</h3>
+                        <p data-i18n="about.services.digitalText">Access to 50+ academic databases and 100,000 e-books</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 data-i18n="about.services.study">Study Spaces</h3>
+                        <p data-i18n="about.services.studyText">200+ individual and group study spaces available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- Team Section -->
-  <section class="section-py bg-light">
-    <div class="container">
-      <h2 class="section-title text-center mb-5" data-i18n="about.team.title">Meet Our Team</h2>
-      <div class="row">
-        <div class="col-md-4 mb-4" data-aos="zoom-in">
-          <div class="team-card glassmorphism text-center">
-            <img src="img/team1.jpg" alt="Dr. Fatima Zohra" class="team-img rounded-circle" />
-            <h3 class="team-name" data-i18n="about.team.member1.name">Dr. Fatima Zohra</h3>
-            <p class="team-role" data-i18n="about.team.member1.role">Head Librarian</p>
-            <p class="team-bio" data-i18n="about.team.member1.bio">With 20 years of experience, Dr. Zohra leads our efforts to modernize library services.</p>
-          </div>
+    <!-- Team Section -->
+    <section class="section-py bg-light" id="team">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 data-i18n="about.team.title">Meet Our Team</h2>
+                <p class="lead" data-i18n="about.team.subtitle">Dedicated professionals supporting your academic success</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="zoom-in">
+                    <div class="team-card">
+                        <img src="/img/team1.jpg" alt="Dr. Fatima Zohra" class="team-img" loading="lazy">
+                        <div class="team-info">
+                            <h4 data-i18n="about.team.member1.name">Dr. Fatima Zohra</h4>
+                            <p class="text-muted" data-i18n="about.team.member1.role">Head Librarian</p>
+                            <p data-i18n="about.team.member1.bio">With 20 years of experience, Dr. Zohra leads our efforts to modernize library services.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="team-card">
+                        <img src="/img/team2.jpg" alt="Mr. Ahmed Benali" class="team-img" loading="lazy">
+                        <div class="team-info">
+                            <h4 data-i18n="about.team.member2.name">Mr. Ahmed Benali</h4>
+                            <p class="text-muted" data-i18n="about.team.member2.role">Digital Resources Manager</p>
+                            <p data-i18n="about.team.member2.bio">Ahmed oversees our e-library platforms and digital archives.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="team-card">
+                        <img src="/img/team3.jpg" alt="Ms. Sara Khedir" class="team-img" loading="lazy">
+                        <div class="team-info">
+                            <h4 data-i18n="about.team.member3.name">Ms. Sara Khedir</h4>
+                            <p class="text-muted" data-i18n="about.team.member3.role">Community Outreach Coordinator</p>
+                            <p data-i18n="about.team.member3.bio">Sara organizes workshops and events to engage our community.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
-          <div class="team-card glassmorphism text-center">
-            <img src="img/team2.jpg" alt="Mr. Ahmed Benali" class="team-img rounded-circle" />
-            <h3 class="team-name" data-i18n="about.team.member2.name">Mr. Ahmed Benali</h3>
-            <p class="team-role" data-i18n="about.team.member2.role">Digital Resources Manager</p>
-            <p class="team-bio" data-i18n="about.team.member2.bio">Ahmed oversees our e-library platforms and digital archives.</p>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
-          <div class="team-card glassmorphism text-center">
-            <img src="img/team3.jpg" alt="Ms. Sara Khedir" class="team-img rounded-circle" />
-            <h3 class="team-name" data-i18n="about.team.member3.name">Ms. Sara Khedir</h3>
-            <p class="team-role" data-i18n="about.team.member3.role">Community Outreach Coordinator</p>
-            <p class="team-bio" data-i18n="about.team.member3.bio">Sara organizes workshops and events to engage our community.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Contact Section -->
-  <section id="contact" class="section-py">
-    <div class="container">
-      <h2 class="section-title text-center mb-5" data-i18n="about.contact.title">Get in Touch</h2>
-      <div class="row">
-        <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
-          <div class="contact-info glassmorphism p-4">
-            <h3 data-i18n="about.contact.info.title">Contact Information</h3>
-            <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="about.contact.info.address">El Oued University, 39000 El Oued, Algeria</span></p>
-            <p><i class="fas fa-phone-alt me-2"></i><a href="tel:+213-32-11-22-33">+213-32-11-22-33</a></p>
-            <p><i class="fas fa-envelope me-2"></i><a href="mailto:library@univ-eloued.dz">library@univ-eloued.dz</a></p>
-            <div class="social-links mt-3">
-              <a href="https://facebook.com/univeloued" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-              <a href="https://twitter.com/univeloued" target="_blank" rel="noopener" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-              <a href="https://linkedin.com/school/univeloued" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    <!-- Statistics Section -->
+    <section class="stats-section section-py">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6 mb-4" data-aos="fade-up">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="250000">0</div>
+                        <div class="stat-label" data-i18n="about.stats.books">Books & Resources</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="50">0</div>
+                        <div class="stat-label" data-i18n="about.stats.databases">Research Databases</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="28">0</div>
+                        <div class="stat-label" data-i18n="about.stats.years">Years of Service</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="15000">0</div>
+                        <div class="stat-label" data-i18n="about.stats.members">Active Members</div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="col-lg-6" data-aos="fade-left">
-          <form id="contactForm" class="contact-form glassmorphism p-4">
-            <div class="mb-3">
-              <label for="contactName" class="form-label" data-i18n="about.contact.form.name">Name</label>
-              <input type="text" class="form-control" id="contactName" required />
+    </section>
+    
+    <!-- Footer -->
+    <footer class="library-footer">
+        <div class="footer-main">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                <a href="../index.html"><img  src="../img/library-logo.png" alt="Library Logo" class="logo"></a>
+                <a class="navbar-brand" href="../index.html"><span class="brand-main"> Uni</span><span class="brand-accent">Library</span></a>                        <p class="footer-about" data-i18n="footer.tagline">Providing world-class resources and services to support academic excellence and research innovation since 1965.</p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.links.title">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="/" data-i18n="nav.home">Home</a></li>
+                            <li><a href="./catalog.html" data-i18n="nav.catalog">Library Catalog</a></li>
+                            <li><a href="./contact.html" data-i18n="nav.librarian">Ask a Librarian</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.resources.title">Resources</h3>
+                        <ul class="footer-links">
+                            <li><a href="./new-arrivals.html" data-i18n="footer.resources.newArrivals">New Arrivals</a></li>
+                            <li><a href="./collections.html" data-i18n="footer.resources.collections">Special Collections</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.contact.title">Contact Us</h3>
+                        <div class="footer-contact">
+                            <p><i class="fas fa-map-marker-alt me-2"></i>123 University Ave, City, State 12345</p>
+                            <p><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</p>
+                            <p><i class="fas fa-envelope me-2"></i>info@unilibrary.com</p>
+                        </div>
+                        <h3 class="footer-title mt-4" data-i18n="footer.newsletter.title">Subscribe to Newsletter</h3>
+                        <form id="newsletterForm">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Enter your email" data-i18n-placeholder="footer.newsletter.placeholder">
+                                <button class="btn btn-primary" type="submit" data-i18n="footer.newsletter.submit">Go</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-              <label for="contactEmail" class="form-label" data-i18n="about.contact.form.email">Email</label>
-              <input type="email" class="form-control" id="contactEmail" required />
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0" data-i18n="footer.copyright">© <span id="current-year"></span> University Library. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="footer-legal">
+                            <a href="./privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
+                            <a href="./terms.html" data-i18n="footer.terms">Terms of Use</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-              <label for="contactMessage" class="form-label" data-i18n="about.contact.form.message">Message</label>
-              <textarea class="form-control" id="contactMessage" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-glow" data-i18n="about.contact.form.submit">Send Message</button>
-          </form>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="library-footer">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <h4 class="footer-brand">UniLibrary</h4>
-          <p data-i18n="footer.tagline">Empowering knowledge since 1995.</p>
-        </div>
-        <div class="col-md-4 mb-4">
-          <h5 data-i18n="footer.links.title">Quick Links</h5>
-          <ul class="footer-links">
-            <li><a href="../index.html" data-i18n="nav.home">Home</a></li>
-            <li><a href="../main/catalog.html" data-i18n="nav.catalog">Library Catalog</a></li>
-            <li><a href="../main/contact.html" data-i18n="nav.contact">Contact</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4 mb-4">
-          <h5 data-i18n="footer.contact.title">Contact Us</h5>
-          <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="about.contact.info.address">El Oued University, 39000 El Oued, Algeria</span></p>
-          <p><i class="fas fa-phone-alt me-2"></i><a href="tel:+213-32-11-22-33">+213-32-11-22-33</a></p>
-          <p><i class="fas fa-envelope me-2"></i><a href="mailto:library@univ-eloued.dz">library@univ-eloued.dz</a></p>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom text-center">
-      <div class="container">
-        <p class="mb-0" data-i18n="footer.copyright">© 2025 UniLibrary. All rights reserved.</p>
-        <div class="footer-legal">
-          <a href="main/privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
-          <a href="main/terms.html" data-i18n="footer.terms">Terms of Use</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    </footer>
 
   <button id="back-to-top" class="btn-back-to-top" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/glide.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="../js/main.js"></script>
+  <!-- Required JS Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@glidejs/glide@3.6.0/dist/glide.min.js"></script>
+
+<!-- Main JS -->
+<script src="../js/main.js"></script>
+
+    <script>
+  AOS.init();
+  new Glide('.glide.featured-collections', {
+    type: 'carousel',
+    startAt: 0,
+    perView: 3,
+    breakpoints: {
+      1024: { perView: 2 },
+      768: { perView: 1 }
+    }
+  }).mount();
+</script>
 </body>
 </html>

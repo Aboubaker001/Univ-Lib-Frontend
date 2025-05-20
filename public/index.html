@@ -1,339 +1,264 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">University Library | Home</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- AOS for animations -->
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
-  <!-- Glide for carousel -->
-  <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide@3.6.0/dist/css/glide.core.min.css">
-  <!-- Custom CSS -->
+    <title>UniLibrary | Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Glide.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@glidejs/glide@3.6.0/dist/css/glide.core.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Main CSS -->
     <link rel="stylesheet" href="./css/main.css">
+    <!-- Preconnect to CDNs for better performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 </head>
-<body data-bs-theme="light">
-    <!-- Navigation -->
+<body>
+    <!-- Header -->
     <header class="fixed-header">
-        <div class="header-top-bar bg-dark">
+        <div class="header-top-bar">
             <div class="container">
-                <div class="d-flex justify-content-between align-items-center py-2">
-                    <div class="header-contact">
-                        <a href="tel:+1234567890" class="text-white me-3"><i class="fas fa-phone-alt me-1"></i> (123) 456-7890</a>
-                        <a href="mailto:info@unilibrary.edu" class="text-white"><i class="fas fa-envelope me-1"></i> info@unilibrary.edu</a>
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <span><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</span>
+                        <span class="ms-3"><i class="fas fa-envelope me-2"></i>info@unilibrary.com</span>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <div class="dropdown language-selector">
-                            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-globe me-1"></i> <span class="language-text">EN</span>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="language-selector dropdown d-inline-block">
+                            <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="language-text">EN</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-gb me-2"></span>English</a></li>
-                                <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-sa me-2"></span>العربية</a></li>
+                            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <nav class="navbar navbar-expand-lg">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="./index.html">
-                    <i class="fas fa-book-open me-2"></i>
-                    <span class="brand-text">
-                        <span class="brand-main">Uni</span><span class="brand-accent">Library</span>
-                    </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <a href="./index.html"><img  src="./img/library-logo.png" alt="Library Logo" class="logo"></a>
+                <a class="navbar-brand" href="./index.html"><span class="brand-main"> Uni</span><span class="brand-accent">Library</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="mainNav">
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="./services.html"><i class="fas fa-concierge-bell me-1 d-lg-none"></i> <span data-i18n="nav.services">Services</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="./main/search-guide.html"><i class="fas fa-search me-1 d-lg-none"></i> <span data-i18n="nav.researchHelp">Research Help</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="./main/about.html"><i class="fas fa-info-circle me-1 d-lg-none"></i> <span data-i18n="nav.about">About</span></a></li>
-                        <li class="nav-item"><a class="nav-link" href="./main/contact.html"><i class="fas fa-envelope me-1 d-lg-none"></i> <span data-i18n="nav.contact">Contact</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="./main/services.html" data-i18n="nav.services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./main/search-guide.html" data-i18n="nav.researchHelp">Research Help</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./main/about.html" data-i18n="nav.about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./main/contact.html" data-i18n="nav.contact">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" id="authButton" href="./login.html" data-i18n="nav.login">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" id="dashboardButton" href="./student/student-dashboard.html" data-i18n="nav.dashboard">Dashboard</a></li>
                     </ul>
-                    <div class="ms-lg-3 mt-3 mt-lg-0">
-                        <a href="./login.html" class="btn btn-outline-light me-2"><i class="fas fa-sign-in-alt me-1"></i> <span data-i18n="nav.login">Login</span></a>
-                        <a href="search.html" class="btn btn-accent btn-glow"><i class="fas fa-search me-1"></i> <span data-i18n="nav.quickSearch">Quick Search</span></a>
-                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
+    <!-- Hero Section -->
     <section class="hero-section" id="hero">
         <div id="particles-js" class="hero-particles"></div>
         <div class="container text-center">
-            <h1 class="hero-title" data-i18n="hero.title">Discover. Learn. Grow.</h1>
-            <p class="hero-subtitle" data-i18n="hero.subtitle">Your gateway to knowledge with over 250,000 resources at your fingertips</p>
-            <br>
-            <br>
-            <div class="book-carousel" data-aos="fade-up">
-                <br>
-                <div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-indicators">
-                        <!-- Dynamically populated -->
-                    </div>
-                    <div class="carousel-inner">
-                        <!-- Dynamically populated -->
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#bookCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+            <div class="glassmorphism">
+                <h1 class="hero-title" data-i18n="home.hero.title">Discover. Learn. Grow.</h1>
+                <p class="hero-subtitle" data-i18n="home.hero.subtitle">Your gateway to knowledge with over 250,000 resources at your fingertips</p>
+                <div class="search-box mt-5">
+                    <form id="searchForm" class="search-container" role="search" aria-label="Library search">
+                        <div class="search-input-group d-flex">
+                            <input type="text" id="searchQuery" class="search-input form-control" placeholder="Search books..." data-i18n-placeholder="home.hero.searchTitle">
+                            <button type="submit" class="btn btn-search ms-2" data-i18n="home.hero.searchButton">Search</button>
+                        </div>
+                        <div class="search-suggestions"></div>
+                    </form>
                 </div>
             </div>
             <a href="#features" class="hero-scroll-indicator" title="Scroll to features section"><i class="fas fa-chevron-down"></i></a>
         </div>
     </section>
 
-<!-- New Intro Section -->
-<section class="intro-section section-py" id="intro">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-delay="100">
-        <div class="intro-video-container">
-          <img src="./img/library-intro.gif" class="intro-video" alt="Library Introduction">
-          <p id="intro-video-description" class="visually-hidden" data-i18n="intro.videoDescription">
-            A brief introduction to UniLibrary, showcasing our vast collection of books, digital resources, and community events.
-          </p>
+    <!-- Intro Section -->
+    <section class="intro-section section-py" id="intro">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="intro-video-container" data-aos="fade-right">
+                        <img src="./img/library-intro.gif" alt="Library Image" class="intro-video">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="intro-title" data-i18n="home.intro.title">Welcome to UniLibrary</h2>
+                    <p class="intro-text" data-i18n="home.intro.description">Explore a world of knowledge with our vast collection of books, digital resources, and community events. UniLibrary is your partner in academic success and research innovation.</p>
+                    <a href="./main/about.html" class="btn btn-primary btn-glow" data-i18n="home.intro.learnMore">Learn More</a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
-        <h2 class="intro-title" data-i18n="intro.title" dir="auto">Welcome to UniLibrary</h2>
-        <p class="intro-text" data-i18n="intro.description" dir="auto">
-          Explore a world of knowledge with our vast collection of books, digital resources, and community events. UniLibrary is your partner in academic success and research innovation.
-        </p>
-        <a href="/main/about-us.html" class="btn btn-primary btn-glow" data-i18n="intro.learnMore" dir="auto">Learn More</a>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- Features Section -->
-    <section id="features" class="container section-py">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title fw-bold" data-i18n="features.title">Our Library Services</h2>
-            <p class="section-subtitle lead text-muted" data-i18n="features.subtitle">Everything you need to support your academic journey</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-card card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon"><i class="fas fa-book-reader"></i></div>
-                        <h4 class="card-title" data-i18n="features.bookLending.title">Book Lending</h4>
-                        <p class="card-text" data-i18n="features.bookLending.description">Borrow from our extensive collection of books for your studies and research.</p>
+    <section class="features-section section-py" id="features">
+        <div class="container text-center">
+            <h2 data-i18n="home.features.title">Our Library Services</h2>
+            <p class="mb-5" data-i18n="home.features.subtitle">Everything you need to support your academic journey</p>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card" data-aos="fade-up">
+                        <i class="fas fa-book feature-icon"></i>
+                        <h3 data-i18n="home.features.bookLending.title">Book Lending</h3>
+                        <p data-i18n="home.features.bookLending.description">Borrow from our extensive collection of books for your studies and research.</p>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="feature-card card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon"><i class="fas fa-laptop"></i></div>
-                        <h4 class="card-title" data-i18n="features.digitalResources.title">Digital Resources</h4>
-                        <p class="card-text" data-i18n="features.digitalResources.description">Access e-books, journals, and databases from anywhere on campus.</p>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                        <i class="fas fa-laptop feature-icon"></i>
+                        <h3 data-i18n="home.features.digitalResources.title">Digital Resources</h3>
+                        <p data-i18n="home.features.digitalResources.description">Access e-books, journals, and databases from anywhere on campus.</p>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="feature-card card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon"><i class="fas fa-users"></i></div>
-                        <h4 class="card-title" data-i18n="features.community.title">Good Community</h4>
-                        <p class="card-text" data-i18n="features.community.description">Join study groups, workshops, and events to enhance your learning experience.</p>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-users feature-icon"></i>
+                        <h3 data-i18n="home.features.community.title">Good Community</h3>
+                        <p data-i18n="home.features.community.description">Join study groups, workshops, and events to enhance your learning experience.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-   <!-- New Arrivals Section -->
-<section id="new-arrivals" class="new-arrivals-section section-py">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title fw-bold" data-i18n="newArrivals.title">New Arrivals</h2>
-            <p class="section-subtitle lead text-muted" data-i18n="newArrivals.subtitle">Discover the latest additions to our library collection</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="new-arrival-card card h-100">
-                    <div class="new-arrival-img">
-                        <img src="https://unsplash.com/photos/futuristic-earth-map-technology-abstract-background-represent-global-connection-concept-m2pxgGc1Yas" alt="New Book: Introduction to Quantum Computing" loading="lazy">
-                    </div>
-                    <div class="new-arrival-body">
-                        <p class="new-arrival-category" data-i18n="newArrivals.quantum.category">Computer Science</p>
-                        <h4 class="new-arrival-title" data-i18n="newArrivals.quantum.title">Introduction to Quantum Computing</h4>
-                        <p class="new-arrival-text" data-i18n="newArrivals.quantum.description">A comprehensive guide to the principles and applications of quantum computing.</p>
-                        <!-- TODO: Replace '#' with actual catalog URL -->
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-i18n="newArrivals.explore" aria-label="Explore Introduction to Quantum Computing">Explore Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="new-arrival-card card h-100">
-                    <div class="new-arrival-img">
-                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73" alt="New Journal: Modern Historical Studies" loading="lazy">
-                    </div>
-                    <div class="new-arrival-body">
-                        <p class="new-arrival-category" data-i18n="newArrivals.history.category">History</p>
-                        <h4 class="new-arrival-title" data-i18n="newArrivals.history.title">Modern Historical Studies</h4>
-                        <p class="new-arrival-text" data-i18n="newArrivals.history.description">The latest volume of peer-reviewed articles on global historical events.</p>
-                        <!-- TODO: Replace '#' with actual catalog URL -->
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-i18n="newArrivals.explore" aria-label="Explore Modern Historical Studies">Explore Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="new-arrival-card card h-100">
-                    <div class="new-arrival-img">
-                        <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f" alt="New E-Book: Sustainable Architecture" loading="lazy">
-                    </div>
-                    <div class="new-arrival-body">
-                        <p class="new-arrival-category" data-i18n="newArrivals.architecture.category">Architecture</p>
-                        <h4 class="new-arrival-title" data-i18n="newArrivals.architecture.title">Sustainable Architecture</h4>
-                        <p class="new-arrival-text" data-i18n="newArrivals.architecture.description">Innovative designs and practices for eco-friendly building solutions.</p>
-                        <!-- TODO: Replace '#' with actual catalog URL -->
-                        <a href="#" class="btn btn-sm btn-outline-primary" data-i18n="newArrivals.explore" aria-label="Explore Sustainable Architecture">Explore Now</a>
-                    </div>
-                </div>
+    <!-- New Arrivals Section -->
+    <section class="new-arrivals-section section-py">
+        <div class="container">
+            <h2 class="text-center" data-i18n="home.newArrivals.title">New Arrivals</h2>
+            <p class="text-center mb-5" data-i18n="home.newArrivals.subtitle">Discover the latest additions to our library collection</p>
+            <div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators"></div>
+                <div class="carousel-inner"></div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#bookCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- Featured Collections -->
-    <section id="collections" class="section-py bg-gradient-primary">
+    <section class="collections-section section-py">
         <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="section-title fw-bold" data-i18n="collections.title">Featured Collections</h2>
-                <p class="section-subtitle lead text-muted" data-i18n="collections.subtitle">Explore our curated collections</p>
-            </div>
-            <div class="glide featured-collections" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-center" data-i18n="home.collections.title">Featured Collections</h2>
+            <p class="text-center mb-5" data-i18n="home.collections.subtitle">Explore our curated collections</p>
+            <div class="glide featured-collections">
                 <div class="glide__track" data-glide-el="track">
-                    <ul class="glide__slides">
-                        <li class="glide__slide">
+                    <div class="glide__slides">
+                        <div class="glide__slide">
                             <div class="collection-card">
                                 <div class="collection-img">
-                                    <img src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc" alt="Science and Technology Collection" loading="lazy">
+                                    <img src="./img/science-tech.jpg" alt="Science & Technology">
                                     <div class="collection-overlay"></div>
                                 </div>
                                 <div class="collection-content">
-                                    <h3 data-i18n="collections.science.title">Science & Technology</h3>
-                                    <p data-i18n="collections.science.description">500+ new titles added this semester</p>
-                                    <a href="#" class="btn btn-sm btn-outline-light" aria-label="Explore Science and Technology Collection" data-i18n="collections.explore">Explore</a>
+                                    <h3 data-i18n="home.collections.science.title">Science & Technology</h3>
+                                    <p data-i18n="home.collections.science.description">500+ new titles added this semester</p>
+                                    <a href="./main/catalog.html" class="btn btn-light btn-glow" data-i18n="home.collections.explore">Explore</a>
                                 </div>
                             </div>
-                        </li>
-                        <li class="glide__slide">
+                        </div>
+                        <div class="glide__slide">
                             <div class="collection-card">
                                 <div class="collection-img">
-                                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8" alt="History and Culture Collection" loading="lazy">
+                                    <img src="./img/history-culture.jpg" alt="History & Culture">
                                     <div class="collection-overlay"></div>
                                 </div>
                                 <div class="collection-content">
-                                    <h3 data-i18n="collections.history.title">History & Culture</h3>
-                                    <p data-i18n="collections.history.description">Rare manuscripts and primary sources</p>
-                                    <a href="#" class="btn btn-sm btn-outline-light" aria-label="Explore History and Culture Collection" data-i18n="collections.explore">Explore</a>
+                                    <h3 data-i18n="home.collections.history.title">History & Culture</h3>
+                                    <p data-i18n="home.collections.history.description">Rare manuscripts and primary sources</p>
+                                    <a href="./main/catalog.html" class="btn btn-light btn-glow" data-i18n="home.collections.explore">Explore</a>
                                 </div>
                             </div>
-                        </li>
-                        <li class="glide__slide">
+                        </div>
+                        <div class="glide__slide">
                             <div class="collection-card">
                                 <div class="collection-img">
-                                    <img src="https://dhjhkxawhe8q4.cloudfront.net/mit-press/wp-content/uploads/2023/02/23114309/march.new_.books_.1050x700.jpg" alt="Art and Design Collection" loading="lazy">
+                                    <img src="./img/art-design.jpg" alt="Art & Design">
                                     <div class="collection-overlay"></div>
                                 </div>
                                 <div class="collection-content">
-                                    <h3 data-i18n="collections.art.title">Art & Design</h3>
-                                    <p data-i18n="collections.art.description">Visual resources and design archives</p>
-                                    <a href="#" class="btn btn-sm btn-outline-light" aria-label="Explore Art and Design Collection" data-i18n="collections.explore">Explore</a>
+                                    <h3 data-i18n="home.collections.art.title">Art & Design</h3>
+                                    <p data-i18n="home.collections.art.description">Visual resources and design archives</p>
+                                    <a href="./main/catalog.html" class="btn btn-light btn-glow" data-i18n="home.collections.explore">Explore</a>
                                 </div>
                             </div>
-                        </li>
-                        <li class="glide__slide">
+                        </div>
+                        <div class="glide__slide">
                             <div class="collection-card">
                                 <div class="collection-img">
-                                    <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66" alt="World Literature Collection" loading="lazy">
+                                    <img src="./img/literature.jpg" alt="World Literature">
                                     <div class="collection-overlay"></div>
                                 </div>
                                 <div class="collection-content">
-                                    <h3 data-i18n="collections.literature.title">World Literature</h3>
-                                    <p data-i18n="collections.literature.description">Classic and contemporary works</p>
-                                    <a href="#" class="btn btn-sm btn-outline-light" aria-label="Explore World Literature Collection" data-i18n="collections.explore">Explore</a>
+                                    <h3 data-i18n="home.collections.literature.title">World Literature</h3>
+                                    <p data-i18n="home.collections.literature.description">Classic and contemporary works</p>
+                                    <a href="./main/catalog.html" class="btn btn-light btn-glow" data-i18n="home.collections.explore">Explore</a>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="glide__bullets" data-glide-el="controls[nav]">
-                    <button class="glide__bullet" data-glide-dir="=0" aria-label="Go to slide 1"></button>
-                    <button class="glide__bullet" data-glide-dir="=1" aria-label="Go to slide 2"></button>
-                    <button class="glide__bullet" data-glide-dir="=2" aria-label="Go to slide 3"></button>
-                    <button class="glide__bullet" data-glide-dir="=3" aria-label="Go to slide 4"></button>
+                        </div>
+                    </div>
                 </div>
                 <div class="glide__arrows" data-glide-el="controls">
-                    <button class="glide__arrow glide__arrow--left" data-glide-dir="<" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
-                    <button class="glide__arrow glide__arrow--right" data-glide-dir=">" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
+                    <button class="glide__arrow glide__arrow--left" data-glide-dir="<" title="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+                    <button class="glide__arrow glide__arrow--right" data-glide-dir=">" title="Next Slide"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Quick Access Section -->
-    <section id="quick-access" class="quick-access-section section-py">
+    <section class="quick-access-section section-py">
         <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="section-title fw-bold" data-i18n="quickAccess.title">Quick Access</h2>
-                <p class="section-subtitle lead text-muted" data-i18n="quickAccess.subtitle">Fast links to essential library resources</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="100">
-                    <div class="quick-access-card card h-100">
-                        <div class="card-body p-4">
-                            <div class="quick-access-icon"><i class="fas fa-book"></i></div>
-                            <h4 class="quick-access-title" data-i18n="quickAccess.catalog.title">Library Catalog</h4>
-                            <p class="quick-access-text" data-i18n="quickAccess.catalog.description">Search our entire collection of books and media.</p>
-                            <a href="catalog.html" class="btn btn-sm btn-outline-primary" data-i18n="quickAccess.explore">Explore</a>
-                        </div>
+            <h2 class="text-center" data-i18n="home.quickAccess.title">Quick Access</h2>
+            <p class="text-center mb-5" data-i18n="home.quickAccess.subtitle">Fast links to essential library resources</p>
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="quick-access-card" data-aos="fade-up">
+                        <i class="fas fa-book-open quick-access-icon"></i>
+                        <h3 class="quick-access-title" data-i18n="home.quickAccess.catalog.title">Library Catalog</h3>
+                        <p class="quick-access-text" data-i18n="home.quickAccess.catalog.description">Search our entire collection of books and media.</p>
+                        <a href="./main/catalog.html" class="btn btn-primary btn-glow" data-i18n="home.quickAccess.explore">Explore</a>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="quick-access-card card h-100">
-                        <div class="card-body p-4">
-                            <div class="quick-access-icon"><i class="fas fa-database"></i></div>
-                            <h4 class="quick-access-title" data-i18n="quickAccess.databases.title">Research Databases</h4>
-                            <p class="quick-access-text" data-i18n="quickAccess.databases.description">Access scholarly articles and journals.</p>
-                            <a href="databases.html" class="btn btn-sm btn-outline-primary" data-i18n="quickAccess.explore">Explore</a>
-                        </div>
+                <div class="col-md-3 mb-4">
+                    <div class="quick-access-card" data-aos="fade-up" data-aos-delay="100">
+                        <i class="fas fa-database quick-access-icon"></i>
+                        <h3 class="quick-access-title" data-i18n="home.quickAccess.databases.title">Research Databases</h3>
+                        <p class="quick-access-text" data-i18n="home.quickAccess.databases.description">Access scholarly articles and journals.</p>
+                        <a href="./main/search-guide.html" class="btn btn-primary btn-glow" data-i18n="home.quickAccess.explore">Explore</a>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="quick-access-card card h-100">
-                        <div class="card-body p-4">
-                            <div class="quick-access-icon"><i class="fas fa-clock"></i></div>
-                            <h4 class="quick-access-title" data-i18n="quickAccess.hours.title">Hours & Locations</h4>
-                            <p class="quick-access-text" data-i18n="quickAccess.hours.description">Find library hours and campus locations.</p>
-                            <a href="hours.html" class="btn btn-sm btn-outline-primary" data-i18n="quickAccess.explore">Explore</a>
-                        </div>
+                <div class="col-md-3 mb-4">
+                    <div class="quick-access-card" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-clock quick-access-icon"></i>
+                        <h3 class="quick-access-title" data-i18n="home.quickAccess.hours.title">Hours & Locations</h3>
+                        <p class="quick-access-text" data-i18n="home.quickAccess.hours.description">Find library hours and campus locations.</p>
+                        <a href="./main/contact.html" class="btn btn-primary btn-glow" data-i18n="home.quickAccess.explore">Explore</a>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="quick-access-card card h-100">
-                        <div class="card-body p-4">
-                            <div class="quick-access-icon"><i class="fas fa-question-circle"></i></div>
-                            <h4 class="quick-access-title" data-i18n="quickAccess.librarian.title">Ask a Librarian</h4>
-                            <p class="quick-access-text" data-i18n="quickAccess.librarian.description">Get help from our expert librarians.</p>
-                            <a href="./ask-librarian.html" class="btn btn-sm btn-outline-primary" data-i18n="quickAccess.explore">Explore</a>
-                        </div>
+                <div class="col-md-3 mb-4">
+                    <div class="quick-access-card" data-aos="fade-up" data-aos-delay="300">
+                        <i class="fas fa-question-circle quick-access-icon"></i>
+                        <h3 class="quick-access-title" data-i18n="home.quickAccess.librarian.title">Ask a Librarian</h3>
+                        <p class="quick-access-text" data-i18n="home.quickAccess.librarian.description">Get help from our expert librarians.</p>
+                        <a href="./main/contact.html" class="btn btn-primary btn-glow" data-i18n="home.quickAccess.explore">Explore</a>
                     </div>
                 </div>
             </div>
@@ -342,85 +267,93 @@
 
     <!-- Footer -->
     <footer class="library-footer">
-        <div class="footer-main py-5">
+        <div class="footer-main">
             <div class="container">
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="footer-brand mb-3">
-                            <i class="fas fa-book-open me-2"></i>
-                            <span class="brand-text">
-                                <span class="brand-main">Uni</span><span class="brand-accent">Library</span>
-                            </span>
-                        </div>
-                        <p class="footer-about" data-i18n="footer.about">Providing world-class resources and services to support academic excellence and research innovation since 1965.</p>
-                        <div class="footer-social mt-4">
-                            <!-- TODO: Replace '#' with actual social media URLs -->
-                            <a href="#" class="social-icon" aria-label="Visit our Facebook page"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-icon" aria-label="Visit our Twitter page"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-icon" aria-label="Visit our Instagram page"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-icon" aria-label="Visit our YouTube channel"><i class="fab fa-youtube"></i></a>
-                            <a href="#" class="social-icon" aria-label="Visit our LinkedIn page"><i class="fab fa-linkedin-in"></i></a>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                <a href="./index.html"><img  src="./img/library-logo.png" alt="Library Logo" class="logo"></a>
+                <a class="navbar-brand" href="./index.html"><span class="brand-main"> Uni</span><span class="brand-accent">Library</span></a>                        <p class="footer-about" data-i18n="footer.tagline">Providing world-class resources and services to support academic excellence and research innovation since 1965.</p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-4">
-                        <h5 class="footer-title" data-i18n="footer.quickLinks.title">Quick Links</h5>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.links.title">Quick Links</h3>
                         <ul class="footer-links">
-                            <li><a href="./index.html"><i class="fas fa-chevron-right me-2"></i> <span data-i18n="footer.quickLinks.home">Home</span></a></li>
-                            <li><a href="./catalog.html"><i class="fas fa-chevron-right me-2"></i> <span data-i18n="footer.quickLinks.catalog">Library Catalog</span></a></li>
-                            <li><a href="./ask-librarian.html"><i class="fas fa-chevron-right me-2"></i> <span data-i18n="footer.quickLinks.askLibrarian">Ask a Librarian</span></a></li>
+                            <li><a href="/" data-i18n="nav.home">Home</a></li>
+                            <li><a href="./main/catalog.html" data-i18n="nav.catalog">Library Catalog</a></li>
+                            <li><a href="./main/contact.html" data-i18n="nav.librarian">Ask a Librarian</a></li>
                         </ul>
                     </div>
-                    <div class="col-lg-3 col-md-4">
-                        <h5 class="footer-title" data-i18n="footer.resources.title">Resources</h5>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.resources.title">Resources</h3>
                         <ul class="footer-links">
-                            <li><a href="./new-arrivals.html"><i class="fas fa-chevron-right me-2"></i> <span data-i18n="footer.resources.newArrivals">New Arrivals</span></a></li>
-                            <li><a href="./special-collections.html"><i class="fas fa-chevron-right me-2"></i> <span data-i18n="footer.resources.specialCollections">Special Collections</span></a></li>
+                            <li><a href="./main/new-arrivals.html" data-i18n="footer.resources.newArrivals">New Arrivals</a></li>
+                            <li><a href="./main/collections.html" data-i18n="footer.resources.collections">Special Collections</a></li>
                         </ul>
                     </div>
-                    <div class="col-lg-3 col-md-4">
-                        <h5 class="footer-title" data-i18n="footer.contact.title">Contact Us</h5>
-                        <address class="footer-contact">
-                            <p><i class="fas fa-map-marker-alt me-2"></i> <span data-i18n="footer.contact.address">123 University Ave, City, State 12345</span></p>
-                            <p><i class="fas fa-phone-alt me-2"></i> (123) 456-7890</p>
-                            <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@unilibrary.edu">info@unilibrary.edu</a></p>
-                        </address>
-                        <div class="footer-newsletter mt-3">
-                            <h6 data-i18n="footer.newsletter.title">Subscribe to Newsletter</h6>
-                            <form class="newsletter-form" id="newsletterForm">
-                                <div class="input-group">
-                                    <input type="email" class="form-control" placeholder="Your email" aria-label="Enter your email for newsletter" required>
-                                    <button class="btn btn-accent" type="submit" data-i18n="footer.newsletter.submit">Go</button>
-                                </div>
-                                <div class="newsletter-message mt-2"></div>
-                            </form>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <h3 class="footer-title" data-i18n="footer.contact.title">Contact Us</h3>
+                        <div class="footer-contact">
+                            <p><i class="fas fa-map-marker-alt me-2"></i>123 University Ave, City, State 12345</p>
+                            <p><i class="fas fa-phone-alt me-2"></i>(123) 456-7890</p>
+                            <p><i class="fas fa-envelope me-2"></i>info@unilibrary.com</p>
+                        </div>
+                        <h3 class="footer-title mt-4" data-i18n="footer.newsletter.title">Subscribe to Newsletter</h3>
+                        <form id="newsletterForm">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Enter your email" data-i18n-placeholder="footer.newsletter.placeholder">
+                                <button class="btn btn-primary" type="submit" data-i18n="footer.newsletter.submit">Go</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0" data-i18n="footer.copyright">© <span id="current-year"></span> University Library. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="footer-legal">
+                            <a href="/privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
+                            <a href="/terms.html" data-i18n="footer.terms">Terms of Use</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer-bottom py-3">
-            <div class="container">
-                <div class="d-md-flex justify-content-between align-items-center">
-                    <div class="mb-2 mb-md-0">
-                        &copy; <span id="current-year"></span> <span data-i18n="footer.copyright">University Library. All rights reserved.</span>
-                    </div>
-                    <div class="footer-legal">
-                        <a href="./privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
-                        <a href="./terms.html" data-i18n="footer.terms">Terms of Use</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button id="back-to-top" class="btn btn-accent btn-glow btn-back-to-top" aria-label="Back to top">
-            <i class="fas fa-arrow-up"></i>
-        </button>
     </footer>
 
+    <!-- Back to Top Button -->
+<button id="back-to-top" title="Back to Top"><i class="fas fa-arrow-up"></i></button>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script src="https://unpkg.com/@glidejs/glide@3.6.0/dist/glide.min.js"></script>
-  <script src="https://unpkg.com/particles.js@2.0.0/particles.min.js"></script>
-    <script src="./js/main.js"></script>
+
+<!-- Required JS Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@glidejs/glide@3.6.0/dist/glide.min.js"></script>
+
+<!-- Main JS -->
+<script src="./js/main.js"></script>
+
+<script>
+  AOS.init();
+  new Glide('.glide.featured-collections', {
+    type: 'carousel',
+    startAt: 0,
+    perView: 3,
+    breakpoints: {
+      1024: { perView: 2 },
+      768: { perView: 1 }
+    }
+  }).mount();
+  
+</script>
 </body>
 </html>

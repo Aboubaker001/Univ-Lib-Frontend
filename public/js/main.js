@@ -1,8 +1,8 @@
 import { fetchWithAuth } from './api.js';
 
-const RECENT_SEARCHES_KEY = 'libraryRecentSearches';
+// Constants
 const API_BASE_URL = process.env.API_URL || 'https://library-backend.railway.app/api';
-
+const RECENT_SEARCHES_KEY = 'libraryRecentSearches';
 const translations = {
   en: {
     home: {
@@ -500,6 +500,661 @@ const translations = {
   }
 };
 
+// State Management
+const authState = {
+  isLoggedIn: localStorage.getItem('token') !== null,
+  isAdmin: localStorage.getItem('userRole') === 'admin',
+  isLibrarian: localStorage.getItem('userRole') === 'librarian',
+  isStudent: localStorage.getItem('userRole') === 'student',
+  isAuthenticated: function() {
+    return this.isLoggedIn && (this.isAdmin || this.isLibrarian || this.isStudent);
+  }
+};
+
+// Utility Functions
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
+
+const showToast = (message) => {
+  const toast = document.createElement('div');
+  toast.className = 'custom-toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 300);
+  }, 2700);
+};
+
+// Core Functions
+function initializeLanguage() {
+  const savedLanguage = localStorage.getItem('language') || 'en';
+  applyLanguage(savedLanguage);
+  document.documentElement.lang = savedLanguage;
+  document.documentElement.setAttribute('dir', savedLanguage === 'ar' ? 'rtl' : 'ltr');
+  document.querySelector('.language-text').textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
+  window.dispatchEvent(new Event('resize'));
+}
+
+function applyLanguage(lang) {
+  const page = window.location.pathname.includes('about-us.html') ? 'about' : 'home';
+  
+  // Update text content
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const keys = element.getAttribute('data-i18n').split('.');
+    let value = translations[lang];
+    keys.forEach(k => value = value?.[k]);
+    if (value) element.textContent = value;
+  });
+  
+  // Update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const keys = element.getAttribute('data-i18n-placeholder').split('.');
+    let value = translations[lang];
+    keys.forEach(k => value = value?.[k]);
+    if (value) element.placeholder = value;
+  });
+  
+  // Update page title
+  document.title = translations[lang][page].title;
+  
+  // Update current year
+  const yearElement = document.getElementById('current-year');
+  if (yearElement) yearElement.textContent = new Date().getFullYear();
+}
+
+function setupLanguageSelector() {
+  const languageItems = document.querySelectorAll('.language-selector .dropdown-item');
+  languageItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const selectedLang = item.getAttribute('data-lang');
+      localStorage.setItem('language', selectedLang);
+      applyLanguage(selectedLang);
+      document.documentElement.lang = selectedLang;
+      document.documentElement.setAttribute('dir', selectedLang === 'ar' ? 'rtl' : 'ltr');
+      document.querySelector('.language-text').textContent = selectedLang === 'ar' ? 'AR' : 'EN';
+      languageItems.forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
+    });
+  });
+}
+
+// Search Functionality
+function setupSearchFunctionality() {
+  const searchForm = document.getElementById('searchForm');
+  const searchInput = document.getElementById('searchQuery');
+  const searchSuggestions = document.querySelector('.search-suggestions');
+  if (!searchForm || !searchInput || !searchSuggestions) return;
+
+  // Form submission
+  searchForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = searchInput.value.trim();
+    if (query) await performSearch(query);
+  });
+
+  // Input handling
+  searchInput.addEventListener('input', debounce(async () => {
+    const query = searchInput.value.trim();
+    if (query.length > 2) await fetchSearchSuggestions(query);
+    else clearSearchSuggestions();
+  }, 300));
+
+  // Focus handling
+  searchInput.addEventListener('focus', () => {
+    const query = searchInput.value.trim();
+    if (query.length > 2) fetchSearchSuggestions(query);
+    else showRecentSearches();
+  });
+
+  // Keyboard navigation
+  searchInput.addEventListener('keydown', (e) => {
+    const suggestions = searchSuggestions.querySelectorAll('.search-suggestion-item');
+    if (!suggestions.length) return;
+    
+    const currentIndex = Array.from(suggestions).findIndex(s => s.classList.contains('selected'));
+    let newIndex = currentIndex;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      newIndex = currentIndex + 1 < suggestions.length ? currentIndex + 1 : 0;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      newIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : suggestions.length - 1;
+    } else if (e.key === 'Enter' && currentIndex >= 0) {
+      e.preventDefault();
+      const selectedQuery = suggestions[currentIndex].getAttribute('data-query');
+      searchInput.value = selectedQuery;
+      performSearch(selectedQuery);
+      return;
+    } else {
+      return;
+    }
+
+    suggestions.forEach(s => s.classList.remove('selected'));
+    suggestions[newIndex].classList.add('selected');
+    suggestions[newIndex].scrollIntoView({ block: 'nearest' });
+  });
+
+  // Suggestion click handling
+  searchSuggestions.addEventListener('click', (e) => {
+    const suggestion = e.target.closest('.search-suggestion-item');
+    if (suggestion) {
+      const query = suggestion.getAttribute('data-query');
+      searchInput.value = query;
+      performSearch(query);
+    }
+  });
+
+  // Close suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!searchForm.contains(e.target)) clearSearchSuggestions();
+  });
+}
+
+async function performSearch(query) {
+  if (!query) return;
+  addToRecentSearches(query);
+  const searchForm = document.getElementById('searchForm');
+  if (searchForm) searchForm.classList.add('search-loading');
+  
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/books/search?q=${encodeURIComponent(query)}`);
+    const result = await response.json();
+    
+    if (result.ok) {
+      window.location.href = `/main/catalog.html?q=${encodeURIComponent(query)}`;
+    } else {
+      showToast(result.message || 'Search failed.');
+    }
+  } catch (error) {
+    console.error('Search error:', error);
+    showToast('An error occurred during search.');
+  } finally {
+    if (searchForm) searchForm.classList.remove('search-loading');
+    clearSearchSuggestions();
+  }
+}
+
+async function fetchSearchSuggestions(query) {
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/books/suggestions?q=${encodeURIComponent(query)}`);
+    const result = await response.json();
+    
+    if (result.ok) {
+      displaySearchSuggestions(result.data);
+    } else {
+      clearSearchSuggestions();
+    }
+  } catch (error) {
+    console.error('Suggestions error:', error);
+    clearSearchSuggestions();
+  }
+}
+
+function displaySearchSuggestions(suggestions) {
+  const searchSuggestions = document.querySelector('.search-suggestions');
+  if (!searchSuggestions) return;
+  
+  searchSuggestions.innerHTML = suggestions.length === 0
+    ? '<div class="search-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
+    : suggestions.map((item, index) => `
+        <div class="search-suggestion-item" data-query="${item.title}" role="option" id="suggestion-${index}" tabindex="0">
+          <i class="fas fa-book me-2 text-primary"></i>
+          ${item.title}
+        </div>
+      `).join('');
+  
+  searchSuggestions.classList.add('show');
+}
+
+function showRecentSearches() {
+  const searchSuggestions = document.querySelector('.search-suggestions');
+  if (!searchSuggestions) return;
+  
+  const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
+  if (recentSearches.length === 0) return;
+  
+  searchSuggestions.innerHTML = `
+    <div class="p-2 text-muted" role="option">Recent searches</div>
+    ${recentSearches.map((item, index) => `
+        <div class="search-suggestion-item" data-query="${item}" role="option" id="recent-${index}" tabindex="0">
+          <i class="fas fa-history me-2"></i>
+          ${item}
+        </div>
+      `).join('')}
+  `;
+  
+  searchSuggestions.classList.add('show');
+}
+
+function addToRecentSearches(query) {
+  const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
+  if (!recentSearches.includes(query)) {
+    recentSearches.unshift(query);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recentSearches.slice(0, 5)));
+  }
+}
+
+function clearSearchSuggestions() {
+  const searchSuggestions = document.querySelector('.search-suggestions');
+  if (searchSuggestions) {
+    searchSuggestions.innerHTML = '';
+    searchSuggestions.classList.remove('show');
+  }
+}
+
+// UI Effects
+function setupHeaderScrollEffects() {
+  const header = document.querySelector('.navbar');
+  if (!header) return;
+  
+  const handleScroll = debounce(() => {
+    header.classList.toggle('scrolled', window.scrollY > 80);
+  }, 10);
+  
+  window.addEventListener('scroll', handleScroll);
+}
+
+function setupSmoothScrolling() {
+  document.addEventListener('click', (e) => {
+    const anchor = e.target.closest('a[href^="#"], .hero-scroll-indicator');
+    if (!anchor) return;
+    
+    e.preventDefault();
+    const targetId = anchor.getAttribute('href')?.substring(1) || 'features';
+    if (targetId === '#') return;
+    
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      const headerHeight = document.querySelector('.fixed-header')?.offsetHeight || 0;
+      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
+      
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }
+  });
+}
+
+function setupBackToTopButton() {
+  const backToTopBtn = document.getElementById('back-to-top');
+  if (!backToTopBtn) return;
+  
+  const handleScroll = debounce(() => {
+    backToTopBtn.classList.toggle('active', window.scrollY > 300);
+  }, 10);
+  
+  window.addEventListener('scroll', handleScroll);
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function setupCardHoverEffects() {
+  document.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('.card, .carousel-book-card');
+    if (!card) return;
+    
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  });
+  
+  document.addEventListener('mouseleave', (e) => {
+    const card = e.target.closest('.card, .carousel-book-card');
+    if (!card) return;
+    
+    card.style.removeProperty('--mouse-x');
+    card.style.removeProperty('--mouse-y');
+  });
+}
+
+// Authentication
+function setupAuthUI() {
+  const authButton = document.getElementById('authButton');
+  const dashboardButton = document.getElementById('dashboardButton');
+  if (!authButton || !dashboardButton) return;
+
+  function updateAuthUI() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const lang = localStorage.getItem('language') || 'en';
+    
+    if (user && user.token) {
+      authButton.setAttribute('data-i18n', 'nav.logout');
+      authButton.textContent = translations[lang].nav.logout;
+      authButton.onclick = handleLogout;
+      dashboardButton.style.display = 'block';
+    } else {
+      authButton.setAttribute('data-i18n', 'nav.login');
+      authButton.textContent = translations[lang].nav.login;
+      authButton.onclick = handleLogin;
+      dashboardButton.style.display = 'none';
+    }
+    
+    applyLanguage(lang);
+  }
+
+  authButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    authButton.onclick();
+  });
+
+  updateAuthUI();
+
+  function handleLogin() {
+    window.location.href = './public/login.html';
+  }
+
+  async function handleLogout() {
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/users/logout`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      const result = await response.json();
+      if (result.message === 'Logged out successfully') {
+        localStorage.removeItem('user');
+        updateAuthUI();
+      } else {
+        showToast(result.message || 'Logout failed.');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      showToast('An error occurred during logout.');
+    }
+  }
+}
+
+// Forms
+function setupNewsletterForm() {
+  const newsletterForm = document.getElementById('newsletterForm');
+  if (!newsletterForm) return;
+
+  newsletterForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = newsletterForm.querySelector('input[type="email"]').value.trim();
+    if (!email) return;
+
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/newsletter`, {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+      
+      const result = await response.json();
+      if (result.ok) {
+        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success || 'Subscribed successfully!');
+        newsletterForm.reset();
+      } else {
+        showToast(result.message || 'Subscription failed.');
+      }
+    } catch (error) {
+      console.error('Newsletter error:', error);
+      showToast('Subscription failed. Try again.');
+    }
+  });
+}
+
+function setupContactForm() {
+  const contactForm = document.getElementById('contactForm');
+  if (!contactForm) return;
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmail').value;
+    const message = document.getElementById('contactMessage').value;
+
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/contact`, {
+        method: 'POST',
+        body: JSON.stringify({ name, email, message })
+      });
+      
+      const result = await response.json();
+      if (result.ok) {
+        showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success);
+        contactForm.reset();
+      } else {
+        showToast(result.message || 'Failed to send message.');
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      showToast('An error occurred. Please try again.');
+    }
+  });
+}
+
+// Animations and Media
+function setupIntroSection() {
+  if (!window.location.pathname.includes('index.html')) return;
+  
+  const introVideo = document.querySelector('.intro-video');
+  if (!introVideo || introVideo.tagName !== 'VIDEO') return;
+  
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          introVideo.play();
+        } else {
+          introVideo.pause();
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+  
+  observer.observe(introVideo);
+}
+
+function initAnimations() {
+  // Initialize AOS if available
+  if (typeof AOS !== 'undefined') {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-quart',
+      once: true,
+      offset: 100
+    });
+  }
+  
+  // Ripple effect for buttons
+  document.addEventListener('click', (e) => {
+    const button = e.target.closest('.btn');
+    if (!button) return;
+    
+    const rect = button.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple-effect');
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    button.appendChild(ripple);
+    
+    setTimeout(() => ripple.remove(), 500);
+  });
+}
+
+// Carousels
+function setupCarousels() {
+  // Featured collections carousel
+  if (typeof Glide !== 'undefined' && document.querySelector('.featured-collections')) {
+    new Glide('.featured-collections', {
+      type: 'carousel',
+      perView: 3,
+      focusAt: 'center',
+      gap: 24,
+      breakpoints: {
+        991: { perView: 2 },
+        575: { perView: 1 }
+      },
+      autoplay: 4000,
+      hoverpause: true,
+      keyboard: true
+    }).mount();
+  }
+
+  // Particles.js background
+  if (typeof particlesJS !== 'undefined' && document.querySelector('#particles-js')) {
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 70, density: { enable: true, value_area: 900 } },
+        color: { value: '#ffffff' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.4, random: true },
+        size: { value: 2.5, random: true },
+        line_linked: { enable: true, distance: 140, color: '#ffffff', opacity: 0.3, width: 2 },
+        move: { enable: true, speed: 1.5, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
+        modes: { repulse: { distance: 90, duration: 0.3 }, push: { particles_nb: 5 } }
+      },
+      retina_detect: true
+    });
+  }
+
+  // Book carousel
+  if (document.querySelector('#bookCarousel')) {
+    setupBookCarousel();
+  }
+}
+
+function setupBookCarousel() {
+  const carouselInner = document.querySelector('#bookCarousel .carousel-inner');
+  const carouselIndicators = document.querySelector('#bookCarousel .carousel-indicators');
+  if (!carouselInner || !carouselIndicators) return;
+
+  async function fetchLatestBooks() {
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/books/latest?limit=10`);
+      const result = await response.json();
+      
+      if (result.ok) {
+        populateCarousel(result.data);
+      } else {
+        throw new Error(result.message || 'Failed to fetch books');
+      }
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      populateCarousel(getMockBooks());
+    }
+  }
+
+  function getMockBooks() {
+    return [
+      {
+        id: '1',
+        title: 'Introduction to Quantum Computing',
+        authors: ['Dr. Jane Smith'],
+        isbn: '978-3-16-148410-0',
+        status: 'AVAILABLE',
+        coverUrl: 'https://via.placeholder.com/150'
+      },
+      {
+        id: '2',
+        title: 'Modern Historical Studies',
+        authors: ['Prof. John Doe'],
+        isbn: '978-1-234-56789-0',
+        status: 'CHECKED_OUT',
+        coverUrl: 'https://via.placeholder.com/150'
+      },
+      {
+        id: '3',
+        title: 'Sustainable Architecture',
+        authors: ['Architect Lisa Brown'],
+        isbn: '978-0-123-45678-9',
+        status: 'AVAILABLE',
+        coverUrl: 'https://via.placeholder.com/150'
+      }
+    ];
+  }
+
+  function populateCarousel(books) {
+    carouselInner.innerHTML = '';
+    carouselIndicators.innerHTML = '';
+    
+    if (books.length === 0) {
+      carouselInner.innerHTML = '<div class="carousel-item"><p class="text-center text-white">No books available.</p></div>';
+      return;
+    }
+
+    books.forEach((book, index) => {
+      const isActive = index === 0 ? 'active' : '';
+      
+      // Create carousel item
+      const carouselItem = document.createElement('div');
+      carouselItem.className = `carousel-item ${isActive}`;
+      carouselItem.innerHTML = `
+        <div class="carousel-book-card mx-auto" style="max-width: 300px;">
+          <div class="carousel-book-img">
+            <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}">
+          </div>
+          <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}">
+            ${book.status.replace('_', ' ')}
+          </div>
+          <div class="carousel-book-body">
+            <h3 class="carousel-book-title">${book.title}</h3>
+            <p class="carousel-book-text" data-i18n="catalog.authors">Authors: ${book.authors.join(', ')}</p>
+            <p class="carousel-book-text" data-i18n="catalog.isbn">ISBN: ${book.isbn}</p>
+            <a href="catalog.html?bookId=${book.id}" class="btn btn-details btn-glow" data-i18n="catalog.viewDetails">View Details</a>
+          </div>
+        </div>
+      `;
+      
+      carouselInner.appendChild(carouselItem);
+
+      // Create indicator
+      const indicator = document.createElement('button');
+      indicator.setAttribute('data-bs-target', '#bookCarousel');
+      indicator.setAttribute('data-bs-slide-to', index);
+      if (isActive) indicator.className = 'active';
+      indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+      carouselIndicators.appendChild(indicator);
+    });
+
+    applyLanguage(localStorage.getItem('language') || 'en');
+  }
+
+  fetchLatestBooks();
+}
+
+// Counter Animation
+function animateCounters() {
+  const counters = document.querySelectorAll('.stat-number');
+  const speed = 200;
+  
+  counters.forEach(counter => {
+    const target = +counter.getAttribute('data-count');
+    const count = +counter.innerText;
+    const increment = target / speed;
+    
+    if (count < target) {
+      counter.innerText = Math.ceil(count + increment);
+      setTimeout(animateCounters, 1);
+    } else {
+      counter.innerText = target;
+    }
+  });
+}
+
+// Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   initializeLanguage();
   setupLanguageSelector();
@@ -515,572 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnimations();
   setupCarousels();
   
-  const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  };
-
-
-  function initializeLanguage() {
-    const savedLanguage = localStorage.getItem('language') || 'en';
-    applyLanguage(savedLanguage);
-    document.documentElement.lang = savedLanguage;
-    document.documentElement.setAttribute('dir', savedLanguage === 'ar' ? 'rtl' : 'ltr');
-    document.querySelector('.language-text').textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
-    window.dispatchEvent(new Event('resize')); // Ensure RTL styles recalculate
-  }
-
-  function applyLanguage(lang) {
-    const page = window.location.pathname.includes('about-us.html') ? 'about' : 'home';
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-      const key = element.getAttribute('data-i18n');
-      const keys = key.split('.');
-      let value = translations[lang];
-      for (const k of keys) {
-        value = value?.[k];
-        if (!value) break;
-      }
-      if (value) element.textContent = value;
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-      const key = element.getAttribute('data-i18n-placeholder');
-      const keys = key.split('.');
-      let value = translations[lang];
-      for (const k of keys) {
-        value = value?.[k];
-        if (!value) break;
-      }
-      if (value) element.placeholder = value;
-    });
-    document.title = translations[lang][page].title;
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  }
-
-  function setupLanguageSelector() {
-    const languageItems = document.querySelectorAll('.language-selector .dropdown-item');
-    languageItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const selectedLang = item.getAttribute('data-lang');
-        localStorage.setItem('language', selectedLang);
-        applyLanguage(selectedLang);
-        document.documentElement.lang = selectedLang;
-        document.documentElement.setAttribute('dir', selectedLang === 'ar' ? 'rtl' : 'ltr');
-        document.querySelector('.language-text').textContent = selectedLang === 'ar' ? 'AR' : 'EN';
-        languageItems.forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
-      });
-    });
-  }
-
-  function setupSearchFunctionality() {
-    const searchForm = document.getElementById('searchForm');
-    const searchInput = document.getElementById('searchQuery');
-    const searchSuggestions = document.querySelector('.search-suggestions');
-    if (!searchForm || !searchInput || !searchSuggestions) return;
-
-    searchForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const query = searchInput.value.trim();
-      if (query) await performSearch(query);
-    });
-
-    searchInput.addEventListener('input', debounce(async () => {
-      const query = searchInput.value.trim();
-      if (query.length > 2) await fetchSearchSuggestions(query);
-      else clearSearchSuggestions();
-    }, 300));
-
-    searchInput.addEventListener('focus', () => {
-      const query = searchInput.value.trim();
-      if (query.length > 2) fetchSearchSuggestions(query);
-      else showRecentSearches();
-    });
-
-    searchInput.addEventListener('keydown', (e) => {
-      const suggestions = searchSuggestions.querySelectorAll('.search-suggestion-item');
-      if (!suggestions.length) return;
-      const currentIndex = Array.from(suggestions).findIndex(s => s.classList.contains('selected'));
-      let newIndex = currentIndex;
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        newIndex = currentIndex + 1 < suggestions.length ? currentIndex + 1 : 0;
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        newIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : suggestions.length - 1;
-      } else if (e.key === 'Enter' && currentIndex >= 0) {
-        e.preventDefault();
-        const selectedQuery = suggestions[currentIndex].getAttribute('data-query');
-        searchInput.value = selectedQuery;
-        performSearch(selectedQuery);
-        return;
-      } else {
-        return;
-      }
-
-      suggestions.forEach(s => s.classList.remove('selected'));
-      suggestions[newIndex].classList.add('selected');
-      suggestions[newIndex].scrollIntoView({ block: 'nearest' });
-    });
-
-    searchSuggestions.addEventListener('click', (e) => {
-      const suggestion = e.target.closest('.search-suggestion-item');
-      if (suggestion) {
-        const query = suggestion.getAttribute('data-query');
-        searchInput.value = query;
-        performSearch(query);
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!searchForm.contains(e.target)) clearSearchSuggestions();
-    });
-  }
-
-  async function performSearch(query) {
-    if (!query) return;
-    addToRecentSearches(query);
-    const searchForm = document.getElementById('searchForm');
-    if (searchForm) searchForm.classList.add('search-loading');
-    try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/books/search?q=${encodeURIComponent(query)}`);
-      const result = await response.json();
-      if (result.ok) {
-        window.location.href = `/main/catalog.html?q=${encodeURIComponent(query)}`;
-      } else {
-        showToast(result.message || 'Search failed.');
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      showToast('An error occurred during search.');
-    } finally {
-      if (searchForm) searchForm.classList.remove('search-loading');
-      clearSearchSuggestions();
-    }
-  }
-
-  async function fetchSearchSuggestions(query) {
-    try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/books/suggestions?q=${encodeURIComponent(query)}`);
-      const result = await response.json();
-      if (result.ok) {
-        displaySearchSuggestions(result.data);
-      } else {
-        clearSearchSuggestions();
-      }
-    } catch (error) {
-      console.error('Suggestions error:', error);
-      clearSearchSuggestions();
-    }
-  }
-
-  function displaySearchSuggestions(suggestions) {
-    const searchSuggestions = document.querySelector('.search-suggestions');
-    if (!searchSuggestions) return;
-    searchSuggestions.innerHTML = suggestions.length === 0
-      ? '<div class="search-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
-      : suggestions.map((item, index) => `
-          <div class="search-suggestion-item" data-query="${item.title}" role="option" id="suggestion-${index}" tabindex="0">
-            <i class="fas fa-book me-2 text-primary"></i>
-            ${item.title}
-          </div>
-        `).join('');
-    searchSuggestions.classList.add('show');
-  }
-
-  function showRecentSearches() {
-    const searchSuggestions = document.querySelector('.search-suggestions');
-    if (!searchSuggestions) return;
-    const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
-    if (recentSearches.length === 0) return;
-    searchSuggestions.innerHTML = `
-      <div class="p-2 text-muted" role="option">Recent searches</div>
-      ${recentSearches.map((item, index) => `
-          <div class="search-suggestion-item" data-query="${item}" role="option" id="recent-${index}" tabindex="0">
-            <i class="fas fa-history me-2"></i>
-            ${item}
-          </div>
-        `).join('')}
-    `;
-    searchSuggestions.classList.add('show');
-  }
-
-  function addToRecentSearches(query) {
-    const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
-    if (!recentSearches.includes(query)) {
-      recentSearches.unshift(query);
-      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recentSearches.slice(0, 5)));
-    }
-  }
-
-  function clearSearchSuggestions() {
-    const searchSuggestions = document.querySelector('.search-suggestions');
-    if (searchSuggestions) {
-      searchSuggestions.innerHTML = '';
-      searchSuggestions.classList.remove('show');
-    }
-  }
-
-  function setupNewsletterForm() {
-    const newsletterForm = document.getElementById('newsletterForm');
-    const newsletterMessage = document.querySelector('.newsletter-message');
-    if (!newsletterForm || !newsletterMessage) return;
-
-    newsletterForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = newsletterForm.querySelector('input[type="email"]').value.trim();
-      if (!email) return;
-
-      try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/newsletter`, {
-          method: 'POST',
-          body: JSON.stringify({ email })
-        });
-        const result = await response.json();
-        if (result.ok) {
-          showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success || 'Subscribed successfully!');
-          newsletterForm.reset();
-        } else {
-          showToast(result.message || 'Subscription failed.');
-        }
-      } catch (error) {
-        console.error('Newsletter error:', error);
-        showToast('Subscription failed. Try again.');
-      }
-    });
-  }
-
-  function setupHeaderScrollEffects() {
-    const header = document.querySelector('.navbar');
-    if (!header) return;
-    const handleScroll = debounce(() => {
-      header.classList.toggle('scrolled', window.scrollY > 80);
-    }, 10);
-    window.addEventListener('scroll', handleScroll);
-  }
-
-  function setupSmoothScrolling() {
-    document.addEventListener('click', (e) => {
-      const anchor = e.target.closest('a[href^="#"], .hero-scroll-indicator');
-      if (!anchor) return;
-      e.preventDefault();
-      const targetId = anchor.getAttribute('href')?.substring(1) || 'features';
-      if (targetId === '#') return;
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-        const headerHeight = document.querySelector('.fixed-header')?.offsetHeight || 0;
-        const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      }
-    });
-  }
-
-  function setupBackToTopButton() {
-    const backToTopBtn = document.getElementById('back-to-top');
-    if (!backToTopBtn) return;
-    const handleScroll = debounce(() => {
-      backToTopBtn.classList.toggle('active', window.scrollY > 300);
-    }, 10);
-    window.addEventListener('scroll', handleScroll);
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  function setupCardHoverEffects() {
-    document.addEventListener('mousemove', (e) => {
-      const card = e.target.closest('.card, .carousel-book-card');
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    });
-    document.addEventListener('mouseleave', (e) => {
-      const card = e.target.closest('.card, .carousel-book-card');
-      if (!card) return;
-      card.style.removeProperty('--mouse-x');
-      card.style.removeProperty('--mouse-y');
-    });
-  }
-
-  function setupAuthUI() {
-    const authButton = document.getElementById('authButton');
-    const dashboardButton = document.getElementById('dashboardButton');
-    if (!authButton || !dashboardButton) return;
-
-    function updateAuthUI() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const lang = localStorage.getItem('language') || 'en';
-      if (user && user.token) {
-        authButton.setAttribute('data-i18n', 'nav.logout');
-        authButton.textContent = translations[lang].nav.logout;
-        authButton.onclick = handleLogout;
-        dashboardButton.style.display = 'block';
-      } else {
-        authButton.setAttribute('data-i18n', 'nav.login');
-        authButton.textContent = translations[lang].nav.login;
-        authButton.onclick = handleLogin;
-        dashboardButton.style.display = 'none';
-      }
-      applyLanguage(lang);
-    }
-
-    authButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      authButton.onclick();
-    });
-
-    updateAuthUI();
-
-    function handleLogin() {
-      window.location.href = './public/login.html';
-    }
-
-    async function handleLogout() {
-      try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/users/logout`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        const result = await response.json();
-        if (result.message === 'Logged out successfully') {
-          localStorage.removeItem('user');
-          updateAuthUI();
-        } else {
-          showToast(result.message || 'Logout failed.');
-        }
-      } catch (error) {
-        console.error('Logout error:', error);
-        showToast('An error occurred during logout.');
-      }
-    }
-  }
-
-  function setupContactForm() {
-    const contactForm = document.getElementById('contactForm');
-    if (!contactForm) return;
-
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('contactName').value;
-      const email = document.getElementById('contactEmail').value;
-      const message = document.getElementById('contactMessage').value;
-
-      try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/contact`, {
-          method: 'POST',
-          body: JSON.stringify({ name, email, message })
-        });
-        const result = await response.json();
-        if (result.ok) {
-          showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success);
-          contactForm.reset();
-        } else {
-          showToast(result.message || 'Failed to send message.');
-        }
-      } catch (error) {
-        console.error('Contact form error:', error);
-        showToast('An error occurred. Please try again.');
-      }
-    });
-  }
-
-// main.js
-function setupIntroSection() {
-  if (!window.location.pathname.includes('index.html')) return;
-  const introVideo = document.querySelector('.intro-video');
-  if (!introVideo || introVideo.tagName !== 'VIDEO') return;
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          introVideo.play();
-        } else {
-          introVideo.pause();
-        }
-      });
-    },
-    { threshold: 0.3 }
-  );
-  observer.observe(introVideo);
-}
-
-  function initAnimations() {
-    if (typeof AOS !== 'undefined') {
-      AOS.init({
-        duration: 800,
-        easing: 'ease-out-quart',
-        once: true,
-        offset: 100
-      });
-    }
-    document.addEventListener('click', (e) => {
-      const button = e.target.closest('.btn');
-      if (!button) return;
-      const rect = button.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const ripple = document.createElement('span');
-      ripple.classList.add('ripple-effect');
-      ripple.style.left = `${x}px`;
-      ripple.style.top = `${y}px`;
-      button.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 500);
-    });
-  }
-
-  function setupCarousels() {
-    if (typeof Glide !== 'undefined' && document.querySelector('.featured-collections')) {
-      new Glide('.featured-collections', {
-        type: 'carousel',
-        perView: 3,
-        focusAt: 'center',
-        gap: 24,
-        breakpoints: {
-          991: { perView: 2 },
-          575: { perView: 1 }
-        },
-        autoplay: 4000,
-        hoverpause: true,
-        keyboard: true
-      }).mount();
-    }
-
-    if (typeof particlesJS !== 'undefined' && document.querySelector('#particles-js')) {
-      particlesJS('particles-js', {
-        particles: {
-          number: { value: 70, density: { enable: true, value_area: 900 } },
-          color: { value: '#ffffff' },
-          shape: { type: 'circle' },
-          opacity: { value: 0.4, random: true },
-          size: { value: 2.5, random: true },
-          line_linked: { enable: true, distance: 140, color: '#ffffff', opacity: 0.3, width: 2 },
-          move: { enable: true, speed: 1.5, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
-        },
-        interactivity: {
-          detect_on: 'canvas',
-          events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
-          modes: { repulse: { distance: 90, duration: 0.3 }, push: { particles_nb: 5 } }
-        },
-        retina_detect: true
-      });
-    }
-
-    if (document.querySelector('#bookCarousel')) {
-      setupBookCarousel();
-    }
-  }
-
-  function setupBookCarousel() {
-    const carouselInner = document.querySelector('#bookCarousel .carousel-inner');
-    const carouselIndicators = document.querySelector('#bookCarousel .carousel-indicators');
-    if (!carouselInner || !carouselIndicators) return;
-
-    async function fetchLatestBooks() {
-      try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/books/latest?limit=10`);
-        const result = await response.json();
-        if (result.ok) {
-          populateCarousel(result.data);
-        } else {
-          throw new Error(result.message || 'Failed to fetch books');
-        }
-      } catch (error) {
-        console.error('Error fetching books:', error);
-        const mockBooks = [
-          {
-            id: '1',
-            title: 'Introduction to Quantum Computing',
-            authors: ['Dr. Jane Smith'],
-            isbn: '978-3-16-148410-0',
-            status: 'AVAILABLE',
-            coverUrl: 'https://via.placeholder.com/150'
-          },
-          {
-            id: '2',
-            title: 'Modern Historical Studies',
-            authors: ['Prof. John Doe'],
-            isbn: '978-1-234-56789-0',
-            status: 'CHECKED_OUT',
-            coverUrl: 'https://via.placeholder.com/150'
-          },
-          {
-            id: '3',
-            title: 'Sustainable Architecture',
-            authors: ['Architect Lisa Brown'],
-            isbn: '978-0-123-45678-9',
-            status: 'AVAILABLE',
-            coverUrl: 'https://via.placeholder.com/150'
-          }
-        ];
-        populateCarousel(mockBooks);
-      }
-    }
-
-    function populateCarousel(books) {
-      carouselInner.innerHTML = '';
-      carouselIndicators.innerHTML = '';
-      if (books.length === 0) {
-        carouselInner.innerHTML = '<div class="carousel-item"><p class="text-center text-white">No books available.</p></div>';
-        return;
-      }
-
-      books.forEach((book, index) => {
-        const isActive = index === 0 ? 'active' : '';
-        const carouselItem = document.createElement('div');
-        carouselItem.className = `carousel-item ${isActive}`;
-        carouselItem.innerHTML = `
-          <div class="carousel-book-card mx-auto" style="max-width: 300px;">
-            <div class="carousel-book-img">
-              <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}">
-            </div>
-            <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}">
-              ${book.status.replace('_', ' ')}
-            </div>
-            <div class="carousel-book-body">
-              <h3 class="carousel-book-title">${book.title}</h3>
-              <p class="carousel-book-text" data-i18n="catalog.authors">Authors: ${book.authors.join(', ')}</p>
-              <p class="carousel-book-text" data-i18n="catalog.isbn">ISBN: ${book.isbn}</p>
-              <a href="catalog.html?bookId=${book.id}" class="btn btn-details btn-glow" data-i18n="catalog.viewDetails">View Details</a>
-            </div>
-          </div>
-        `;
-        carouselInner.appendChild(carouselItem);
-
-        const indicator = document.createElement('button');
-        indicator.setAttribute('data-bs-target', '#bookCarousel');
-        indicator.setAttribute('data-bs-slide-to', index);
-        if (isActive) indicator.className = 'active';
-        indicator.setAttribute('aria-label', `Slide ${index + 1}`);
-        carouselIndicators.appendChild(indicator);
-      });
-
-      applyLanguage(localStorage.getItem('language') || 'en');
-    }
-
-    fetchLatestBooks();
-  }
-
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.position = 'fixed';
-    toast.style.bottom = '20px';
-    toast.style.right = '20px';
-    toast.style.padding = '10px 20px';
-    toast.style.background = 'var(--primary-color)';
-    toast.style.color = 'var(--white)';
-    toast.style.borderRadius = 'var(--border-radius)';
-    toast.style.zIndex = '1000';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
+  // Update auth buttons visibility
+  document.getElementById('authButton').style.display = authState.isLoggedIn ? 'none' : 'inline-block';
+  document.getElementById('dashboardButton').style.display = authState.isLoggedIn ? 'inline-block' : 'none';
 });
