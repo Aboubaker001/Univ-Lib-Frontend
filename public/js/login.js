@@ -4,7 +4,7 @@ const api = {
   login: async ({ email, password }) => {
     console.log('Attempting login with:', { email });
     try {
-      const response = await fetch('http://localhost:5000/api/user/login', {
+      const response = await fetch('https://univ-lib-backend.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -27,7 +27,7 @@ const api = {
   registerUser: async (formData) => {
     console.log('Attempting registration with:', Object.fromEntries(formData));
     try {
-      const response = await fetch('http://localhost:5000/api/user/register', {
+      const response = await fetch('https://univ-lib-backend.onrender.com/api/user/register', {
         method: 'POST',
         body: formData
       });

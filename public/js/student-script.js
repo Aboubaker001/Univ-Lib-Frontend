@@ -2,7 +2,7 @@ import i18next from 'https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18ne
 import LanguageDetector from 'https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js';
 import { gsap } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://univ-lib-backend.onrender.com/api';
 
 // Consolidated translations
 const translations = {
