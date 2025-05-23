@@ -9,7 +9,7 @@ export async function fetchWithAuth(url, options = {}) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE_URL = 'http://localhost:3000/api';
+    const API_BASE_URL = 'https://univ-lib-backend.onrender.com/api';
     const RECENT_SEARCHES_KEY = 'libraryRecentSearches';
 
     // Initialize catalog page

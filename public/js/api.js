@@ -11,7 +11,7 @@ export async function fetchWithAuth(endpoint, options = {}) {
   };
 
   try {
-    const response = await fetch(`${process.env.API_URL || 'https://univ-lib-backend.onrender.com/api'}${endpoint}`, {
+    const response = await fetch(`${'https://univ-lib-backend.onrender.com/api'}${endpoint}`, {
       ...options,
       headers: {
         ...headers,

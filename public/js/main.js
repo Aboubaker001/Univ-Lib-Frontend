@@ -2,7 +2,7 @@
 import { fetchWithAuth } from './api.js';
 
 // Constants
-const API_BASE_URL = process.env.API_URL || 'https://univ-lib-backend.onrender.com/api';
+const API_BASE_URL = 'https://univ-lib-backend.onrender.com/api';
 const RECENT_SEARCHES_KEY = 'libraryRecentSearches';
 const translations = {
   en: {
