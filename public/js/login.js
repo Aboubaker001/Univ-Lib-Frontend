@@ -1,6 +1,6 @@
 // frontend/public/js/login.js
 // Constants
-const API_BASE_URL = process.env.API_URL || 'https://univ-lib-backend.onrender.com/api';
+const API_BASE_URL = 'https://univ-lib-backend.onrender.com/api';
 const LOGIN_ATTEMPT_LIMIT = 5;
 const LOGIN_ATTEMPT_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 const TOAST_DURATION = 3000;
@@ -141,7 +141,7 @@ const translations = {
 const api = {
   login: async ({ email, password }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -163,7 +163,7 @@ const api = {
   },
   registerUser: async (formData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/register`, {
+      const response = await fetch(`${API_BASE_URL}/user/register`, {
         method: 'POST',
         body: formData,
         credentials: 'include'
