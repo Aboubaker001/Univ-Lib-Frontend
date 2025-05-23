@@ -520,12 +520,12 @@ const debounce = (func, wait) => {
   };
 };
 
-const showToast = (message) => {
+const showToast = (message, type = 'info') => {
   const toast = document.createElement('div');
-  toast.className = 'custom-toast';
+  toast.className = `toast alert-${type}`; // Use alert-info, alert-error, alert-success from main.css
   toast.textContent = message;
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.classList.add('fade-out');
     setTimeout(() => toast.remove(), 300);
@@ -545,7 +545,6 @@ function initializeLanguage() {
 function applyLanguage(lang) {
   const page = window.location.pathname.includes('about-us.html') ? 'about' : 'home';
   
-  // Update text content
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const keys = element.getAttribute('data-i18n').split('.');
     let value = translations[lang];
@@ -553,7 +552,6 @@ function applyLanguage(lang) {
     if (value) element.textContent = value;
   });
   
-  // Update placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
     const keys = element.getAttribute('data-i18n-placeholder').split('.');
     let value = translations[lang];
@@ -561,10 +559,8 @@ function applyLanguage(lang) {
     if (value) element.placeholder = value;
   });
   
-  // Update page title
   document.title = translations[lang][page].title;
   
-  // Update current year
   const yearElement = document.getElementById('current-year');
   if (yearElement) yearElement.textContent = new Date().getFullYear();
 }
@@ -592,28 +588,24 @@ function setupSearchFunctionality() {
   const searchSuggestions = document.querySelector('.search-suggestions');
   if (!searchForm || !searchInput || !searchSuggestions) return;
 
-  // Form submission
   searchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const query = searchInput.value.trim();
     if (query) await performSearch(query);
   });
 
-  // Input handling
   searchInput.addEventListener('input', debounce(async () => {
     const query = searchInput.value.trim();
     if (query.length > 2) await fetchSearchSuggestions(query);
     else clearSearchSuggestions();
   }, 300));
 
-  // Focus handling
   searchInput.addEventListener('focus', () => {
     const query = searchInput.value.trim();
     if (query.length > 2) fetchSearchSuggestions(query);
     else showRecentSearches();
   });
 
-  // Keyboard navigation
   searchInput.addEventListener('keydown', (e) => {
     const suggestions = searchSuggestions.querySelectorAll('.search-suggestion-item');
     if (!suggestions.length) return;
@@ -642,7 +634,6 @@ function setupSearchFunctionality() {
     suggestions[newIndex].scrollIntoView({ block: 'nearest' });
   });
 
-  // Suggestion click handling
   searchSuggestions.addEventListener('click', (e) => {
     const suggestion = e.target.closest('.search-suggestion-item');
     if (suggestion) {
@@ -652,7 +643,6 @@ function setupSearchFunctionality() {
     }
   });
 
-  // Close suggestions when clicking outside
   document.addEventListener('click', (e) => {
     if (!searchForm.contains(e.target)) clearSearchSuggestions();
   });
@@ -663,19 +653,17 @@ async function performSearch(query) {
   addToRecentSearches(query);
   const searchForm = document.getElementById('searchForm');
   if (searchForm) searchForm.classList.add('search-loading');
-  
+
   try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/books/search?q=${encodeURIComponent(query)}`);
-    const result = await response.json();
-    
-    if (result.ok) {
+    const { ok, data } = await fetchWithAuth(`/books/search?q=${encodeURIComponent(query)}`);
+    if (ok) {
       window.location.href = `/main/catalog.html?q=${encodeURIComponent(query)}`;
     } else {
-      showToast(result.message || 'Search failed.');
+      showToast(data.message || 'Search failed.', 'error');
     }
   } catch (error) {
     console.error('Search error:', error);
-    showToast('An error occurred during search.');
+    showToast(error.message || 'An error occurred during search.', 'error');
   } finally {
     if (searchForm) searchForm.classList.remove('search-loading');
     clearSearchSuggestions();
@@ -684,11 +672,9 @@ async function performSearch(query) {
 
 async function fetchSearchSuggestions(query) {
   try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/books/suggestions?q=${encodeURIComponent(query)}`);
-    const result = await response.json();
-    
-    if (result.ok) {
-      displaySearchSuggestions(result.data);
+    const { ok, data } = await fetchWithAuth(`/books/suggestions?q=${encodeURIComponent(query)}`);
+    if (ok) {
+      displaySearchSuggestions(data);
     } else {
       clearSearchSuggestions();
     }
@@ -800,7 +786,7 @@ function setupBackToTopButton() {
 
 function setupCardHoverEffects() {
   document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('.card, .carousel-book-card');
+    const card = e.target.closest('.card, .carousel-book-card, .collection-card');
     if (!card) return;
     
     const rect = card.getBoundingClientRect();
@@ -812,7 +798,7 @@ function setupCardHoverEffects() {
   });
   
   document.addEventListener('mouseleave', (e) => {
-    const card = e.target.closest('.card, .carousel-book-card');
+    const card = e.target.closest('.card, .carousel-book-card, .collection-card');
     if (!card) return;
     
     card.style.removeProperty('--mouse-x');
@@ -827,14 +813,16 @@ function setupAuthUI() {
   if (!authButton || !dashboardButton) return;
 
   function updateAuthUI() {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
     const lang = localStorage.getItem('language') || 'en';
     
-    if (user && user.token) {
+    if (token) {
       authButton.setAttribute('data-i18n', 'nav.logout');
       authButton.textContent = translations[lang].nav.logout;
       authButton.onclick = handleLogout;
       dashboardButton.style.display = 'block';
+      dashboardButton.href = userRole === 'student' ? '/student/home.html' : '/admin-librarian/dashboard.html';
     } else {
       authButton.setAttribute('data-i18n', 'nav.login');
       authButton.textContent = translations[lang].nav.login;
@@ -858,21 +846,23 @@ function setupAuthUI() {
 
   async function handleLogout() {
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/users/logout`, {
+      const { ok, data } = await fetchWithAuth('/users/logout', {
         method: 'GET',
         credentials: 'include'
       });
       
-      const result = await response.json();
-      if (result.message === 'Logged out successfully') {
-        localStorage.removeItem('user');
+      if (ok && data.message === 'Logged out successfully') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        showToast('Logged out successfully!', 'success');
         updateAuthUI();
+        window.location.href = '/main/home.html';
       } else {
-        showToast(result.message || 'Logout failed.');
+        showToast(data.message || 'Logout failed.', 'error');
       }
     } catch (error) {
       console.error('Logout error:', error);
-      showToast('An error occurred during logout.');
+      showToast(error.message || 'An error occurred during logout.', 'error');
     }
   }
 }
@@ -888,21 +878,20 @@ function setupNewsletterForm() {
     if (!email) return;
 
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/newsletter`, {
+      const { ok, data } = await fetchWithAuth('/newsletter', {
         method: 'POST',
         body: JSON.stringify({ email })
       });
       
-      const result = await response.json();
-      if (result.ok) {
-        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success || 'Subscribed successfully!');
+      if (ok) {
+        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success || 'Subscribed successfully!', 'success');
         newsletterForm.reset();
       } else {
-        showToast(result.message || 'Subscription failed.');
+        showToast(data.message || 'Subscription failed.', 'error');
       }
     } catch (error) {
       console.error('Newsletter error:', error);
-      showToast('Subscription failed. Try again.');
+      showToast(error.message || 'Subscription failed. Try again.', 'error');
     }
   });
 }
@@ -918,21 +907,20 @@ function setupContactForm() {
     const message = document.getElementById('contactMessage').value;
 
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/contact`, {
+      const { ok, data } = await fetchWithAuth('/contact', {
         method: 'POST',
         body: JSON.stringify({ name, email, message })
       });
       
-      const result = await response.json();
-      if (result.ok) {
-        showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success);
+      if (ok) {
+        showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success, 'success');
         contactForm.reset();
       } else {
-        showToast(result.message || 'Failed to send message.');
+        showToast(data.message || 'Failed to send message.', 'error');
       }
     } catch (error) {
       console.error('Contact form error:', error);
-      showToast('An error occurred. Please try again.');
+      showToast(error.message || 'An error occurred. Please try again.', 'error');
     }
   });
 }
@@ -961,7 +949,6 @@ function setupIntroSection() {
 }
 
 function initAnimations() {
-  // Initialize AOS if available
   if (typeof AOS !== 'undefined') {
     AOS.init({
       duration: 800,
@@ -971,7 +958,6 @@ function initAnimations() {
     });
   }
   
-  // Ripple effect for buttons
   document.addEventListener('click', (e) => {
     const button = e.target.closest('.btn');
     if (!button) return;
@@ -990,52 +976,7 @@ function initAnimations() {
   });
 }
 
-// Carousels
-function setupCarousels() {
-  // Featured collections carousel
-  if (typeof Glide !== 'undefined' && document.querySelector('.featured-collections')) {
-    new Glide('.featured-collections', {
-      type: 'carousel',
-      perView: 3,
-      focusAt: 'center',
-      gap: 24,
-      breakpoints: {
-        991: { perView: 2 },
-        575: { perView: 1 }
-      },
-      autoplay: 4000,
-      hoverpause: true,
-      keyboard: true
-    }).mount();
-  }
-
-  // Particles.js background
-  if (typeof particlesJS !== 'undefined' && document.querySelector('#particles-js')) {
-    particlesJS('particles-js', {
-      particles: {
-        number: { value: 70, density: { enable: true, value_area: 900 } },
-        color: { value: '#ffffff' },
-        shape: { type: 'circle' },
-        opacity: { value: 0.4, random: true },
-        size: { value: 2.5, random: true },
-        line_linked: { enable: true, distance: 140, color: '#ffffff', opacity: 0.3, width: 2 },
-        move: { enable: true, speed: 1.5, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
-      },
-      interactivity: {
-        detect_on: 'canvas',
-        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
-        modes: { repulse: { distance: 90, duration: 0.3 }, push: { particles_nb: 5 } }
-      },
-      retina_detect: true
-    });
-  }
-
-  // Book carousel
-  if (document.querySelector('#bookCarousel')) {
-    setupBookCarousel();
-  }
-}
-
+// Data Fetching and Rendering
 function setupBookCarousel() {
   const carouselInner = document.querySelector('#bookCarousel .carousel-inner');
   const carouselIndicators = document.querySelector('#bookCarousel .carousel-indicators');
@@ -1043,16 +984,15 @@ function setupBookCarousel() {
 
   async function fetchLatestBooks() {
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/books/latest?limit=10`);
-      const result = await response.json();
-      
-      if (result.ok) {
-        populateCarousel(result.data);
+      const { ok, data } = await fetchWithAuth('/books/latest?limit=10');
+      if (ok) {
+        populateCarousel(data);
       } else {
-        throw new Error(result.message || 'Failed to fetch books');
+        throw new Error(data.message || 'Failed to fetch books');
       }
     } catch (error) {
       console.error('Error fetching books:', error);
+      showToast(error.message || 'Failed to load latest books.', 'error');
       populateCarousel(getMockBooks());
     }
   }
@@ -1098,7 +1038,6 @@ function setupBookCarousel() {
     books.forEach((book, index) => {
       const isActive = index === 0 ? 'active' : '';
       
-      // Create carousel item
       const carouselItem = document.createElement('div');
       carouselItem.className = `carousel-item ${isActive}`;
       carouselItem.innerHTML = `
@@ -1120,7 +1059,6 @@ function setupBookCarousel() {
       
       carouselInner.appendChild(carouselItem);
 
-      // Create indicator
       const indicator = document.createElement('button');
       indicator.setAttribute('data-bs-target', '#bookCarousel');
       indicator.setAttribute('data-bs-slide-to', index);
@@ -1133,6 +1071,197 @@ function setupBookCarousel() {
   }
 
   fetchLatestBooks();
+}
+
+function setupFeaturedCollections() {
+  const collectionsContainer = document.querySelector('.featured-collections .glide__slides');
+  if (!collectionsContainer) return;
+
+  async function fetchFeaturedCollections() {
+    try {
+      const { ok, data } = await fetchWithAuth('/collections/featured');
+      if (ok) {
+        populateCollections(data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch collections');
+      }
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+      showToast(error.message || 'Failed to load featured collections.', 'error');
+      populateCollections(getMockCollections());
+    }
+  }
+
+  function getMockCollections() {
+    return [
+      {
+        id: 'science',
+        title: translations[localStorage.getItem('language') || 'en'].collections.science.title,
+        description: translations[localStorage.getItem('language') || 'en'].collections.science.description,
+        imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31'
+      },
+      {
+        id: 'history',
+        title: translations[localStorage.getItem('language') || 'en'].collections.history.title,
+        description: translations[localStorage.getItem('language') || 'en'].collections.history.description,
+        imageUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da'
+      },
+      {
+        id: 'art',
+        title: translations[localStorage.getItem('language') || 'en'].collections.art.title,
+        description: translations[localStorage.getItem('language') || 'en'].collections.art.description,
+        imageUrl: 'https://images.unsplash.com/photo-1515405295579-ba7b45403062'
+      },
+      {
+        id: 'literature',
+        title: translations[localStorage.getItem('language') || 'en'].collections.literature.title,
+        description: translations[localStorage.getItem('language') || 'en'].collections.literature.description,
+        imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd5c'
+      }
+    ];
+  }
+
+  function populateCollections(collections) {
+    collectionsContainer.innerHTML = '';
+    
+    if (collections.length === 0) {
+      collectionsContainer.innerHTML = '<div class="glide__slide"><p class="text-center text-white">No collections available.</p></div>';
+      return;
+    }
+
+    collections.forEach(collection => {
+      const slide = document.createElement('div');
+      slide.className = 'glide__slide';
+      slide.innerHTML = `
+        <div class="collection-card">
+          <div class="collection-img">
+            <img src="${collection.imageUrl || 'https://via.placeholder.com/300'}" alt="${collection.title}">
+            <div class="collection-overlay"></div>
+          </div>
+          <div class="collection-content">
+            <h3>${collection.title}</h3>
+            <p>${collection.description}</p>
+            <a href="catalog.html?collection=${collection.id}" class="btn btn-primary btn-glow">${
+              translations[localStorage.getItem('language') || 'en'].collections.explore
+            }</a>
+          </div>
+        </div>
+      `;
+      collectionsContainer.appendChild(slide);
+    });
+
+    // Reinitialize Glide carousel after populating
+    if (typeof Glide !== 'undefined') {
+      new Glide('.featured-collections', {
+        type: 'carousel',
+        perView: 3,
+        focusAt: 'center',
+        gap: 24,
+        breakpoints: {
+          991: { perView: 2 },
+          575: { perView: 1 }
+        },
+        autoplay: 4000,
+        hoverpause: true,
+        keyboard: true
+      }).mount();
+    }
+
+    applyLanguage(localStorage.getItem('language') || 'en');
+  }
+
+  fetchFeaturedCollections();
+}
+
+function setupQuickAccess() {
+  const quickAccessContainer = document.querySelector('.quick-access-section .row');
+  if (!quickAccessContainer) return;
+
+  async function fetchQuickAccessLinks() {
+    try {
+      const { ok, data } = await fetchWithAuth('/quick-access');
+      if (ok) {
+        populateQuickAccess(data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch quick access links');
+      }
+    } catch (error) {
+      console.error('Error fetching quick access links:', error);
+      showToast(error.message || 'Failed to load quick access links.', 'error');
+      populateQuickAccess(getMockQuickAccess());
+    }
+  }
+
+  function getMockQuickAccess() {
+    return [
+      {
+        id: 'catalog',
+        title: translations[localStorage.getItem('language') || 'en'].quickAccess.catalog.title,
+        description: translations[localStorage.getItem('language') || 'en'].quickAccess.catalog.description,
+        url: 'catalog.html',
+        icon: 'fas fa-book'
+      },
+      {
+        id: 'databases',
+        title: translations[localStorage.getItem('language') || 'en'].quickAccess.databases.title,
+        description: translations[localStorage.getItem('language') || 'en'].quickAccess.databases.description,
+        url: 'databases.html',
+        icon: 'fas fa-database'
+      },
+      {
+        id: 'hours',
+        title: translations[localStorage.getItem('language') || 'en'].quickAccess.hours.title,
+        description: translations[localStorage.getItem('language') || 'en'].quickAccess.hours.description,
+        url: 'hours.html',
+        icon: 'fas fa-clock'
+      },
+      {
+        id: 'librarian',
+        title: translations[localStorage.getItem('language') || 'en'].quickAccess.librarian.title,
+        description: translations[localStorage.getItem('language') || 'en'].quickAccess.librarian.description,
+        url: 'contact.html',
+        icon: 'fas fa-user'
+      }
+    ];
+  }
+
+  function populateQuickAccess(links) {
+    quickAccessContainer.innerHTML = '';
+    
+    if (links.length === 0) {
+      quickAccessContainer.innerHTML = '<p class="text-center text-muted">No quick access links available.</p>';
+      return;
+    }
+
+    links.forEach(link => {
+      const col = document.createElement('div');
+      col.className = 'col-lg-3 col-md-6 mb-4';
+      col.innerHTML = `
+        <div class="quick-access-card">
+          <i class="${link.icon} quick-access-icon"></i>
+          <h3 class="quick-access-title">${link.title}</h3>
+          <p class="quick-access-text">${link.description}</p>
+          <a href="${link.url}" class="btn btn-primary btn-glow">${
+            translations[localStorage.getItem('language') || 'en'].quickAccess.explore
+          }</a>
+        </div>
+      `;
+      quickAccessContainer.appendChild(col);
+    });
+
+    applyLanguage(localStorage.getItem('language') || 'en');
+  }
+
+  fetchQuickAccessLinks();
+}
+
+// Carousels
+function setupCarousels() {
+  // Book carousel
+  if (document.querySelector('#bookCarousel')) {
+    setupBookCarousel();
+  }
+  // Featured collections carousel is handled in setupFeaturedCollections
 }
 
 // Counter Animation
@@ -1169,6 +1298,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupIntroSection();
   initAnimations();
   setupCarousels();
+  setupFeaturedCollections();
+  setupQuickAccess();
   
   // Update auth buttons visibility
   document.getElementById('authButton').style.display = authState.isLoggedIn ? 'none' : 'inline-block';
