@@ -220,6 +220,132 @@ html[dir="rtl"] .language-selector .flag-icon {
     padding: 80px 0;
 }
 
+/* frontend/public/css/main.css */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+.toast.fade-out {
+  opacity: 0;
+}
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.carousel-book-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+}
+.carousel-book-img img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+.carousel-book-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.status-available {
+  background-color: #28a745;
+  color: #fff;
+}
+.status-checked-out {
+  background-color: #dc3545;
+  color: #fff;
+}
+.carousel-book-body {
+  padding: 15px;
+}
+.carousel-book-title {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+.carousel-book-text {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 5px;
+}
+.btn-details {
+  background-color: #007bff;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.btn-details:hover {
+  background-color: #0056b3;
+}
+.btn-glow {
+  transition: box-shadow 0.3s ease;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 10px rgba(0,123,255,0.5);
+}
+.collection-card {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.collection-img img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+.collection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+}
+.collection-content {
+  padding: 15px;
+  text-align: center;
+}
+.quick-access-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.quick-access-icon {
+  font-size: 2em;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+.quick-access-title {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+.quick-access-text {
+  font-size: 0.9em;
+  color: #555;
+}
+
+
 /* Header & Navigation */
 .fixed-header {
     position: relative;

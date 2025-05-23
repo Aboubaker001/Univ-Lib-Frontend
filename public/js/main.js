@@ -1,3 +1,4 @@
+// frontend/public/js/main.js
 import { fetchWithAuth } from './api.js';
 
 // Constants
@@ -247,7 +248,8 @@ const translations = {
       },
       newsletter: {
         title: 'Subscribe to Newsletter',
-        submit: 'Go'
+        submit: 'Go',
+        success: 'Subscribed successfully!'
       }
     }
   },
@@ -494,7 +496,8 @@ const translations = {
       },
       newsletter: {
         title: 'اشترك في النشرة الإخبارية',
-        submit: 'إرسال'
+        submit: 'إرسال',
+        success: 'تم الاشتراك بنجاح!'
       }
     }
   }
@@ -502,7 +505,7 @@ const translations = {
 
 // State Management
 const authState = {
-  isLoggedIn: localStorage.getItem('token') !== null,
+  isLoggedIn: !!localStorage.getItem('token'),
   isAdmin: localStorage.getItem('userRole') === 'admin',
   isLibrarian: localStorage.getItem('userRole') === 'librarian',
   isStudent: localStorage.getItem('userRole') === 'student',
@@ -522,9 +525,10 @@ const debounce = (func, wait) => {
 
 const showToast = (message, type = 'info') => {
   const toast = document.createElement('div');
-  toast.className = `toast alert-${type}`; // Use alert-info, alert-error, alert-success from main.css
+  toast.className = `toast alert-${type}`;
   toast.textContent = message;
   document.body.appendChild(toast);
+  console.log(`Toast displayed: ${message} (${type})`);
 
   setTimeout(() => {
     toast.classList.add('fade-out');
@@ -535,48 +539,82 @@ const showToast = (message, type = 'info') => {
 // Core Functions
 function initializeLanguage() {
   const savedLanguage = localStorage.getItem('language') || 'en';
+  console.log(`Initializing language: ${savedLanguage}`);
   applyLanguage(savedLanguage);
   document.documentElement.lang = savedLanguage;
   document.documentElement.setAttribute('dir', savedLanguage === 'ar' ? 'rtl' : 'ltr');
-  document.querySelector('.language-text').textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
+  const languageText = document.querySelector('.language-text');
+  if (languageText) {
+    languageText.textContent = savedLanguage === 'ar' ? 'AR' : 'EN';
+  } else {
+    console.warn('Language text element (.language-text) not found');
+  }
   window.dispatchEvent(new Event('resize'));
 }
 
 function applyLanguage(lang) {
+  console.log(`Applying language: ${lang}`);
   const page = window.location.pathname.includes('about-us.html') ? 'about' : 'home';
-  
+
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const keys = element.getAttribute('data-i18n').split('.');
     let value = translations[lang];
     keys.forEach(k => value = value?.[k]);
-    if (value) element.textContent = value;
+    if (value) {
+      element.textContent = value;
+    } else {
+      console.warn(`Translation missing for ${lang}.${keys.join('.')}`);
+    }
   });
-  
+
   document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
     const keys = element.getAttribute('data-i18n-placeholder').split('.');
     let value = translations[lang];
     keys.forEach(k => value = value?.[k]);
-    if (value) element.placeholder = value;
+    if (value) {
+      element.placeholder = value;
+    } else {
+      console.warn(`Placeholder translation missing for ${lang}.${keys.join('.')}`);
+    }
   });
-  
-  document.title = translations[lang][page].title;
-  
+
+  document.title = translations[lang][page].title || 'UniLibrary';
   const yearElement = document.getElementById('current-year');
-  if (yearElement) yearElement.textContent = new Date().getFullYear();
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
 }
 
 function setupLanguageSelector() {
   const languageItems = document.querySelectorAll('.language-selector .dropdown-item');
+  if (!languageItems.length) {
+    console.warn('Language selector items (.language-selector .dropdown-item) not found');
+    return;
+  }
+
+  console.log(`Found ${languageItems.length} language selector items`);
   languageItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const selectedLang = item.getAttribute('data-lang');
+      if (!selectedLang) {
+        console.warn('Language item missing data-lang attribute');
+        return;
+      }
+      console.log(`Language selected: ${selectedLang}`);
       localStorage.setItem('language', selectedLang);
       applyLanguage(selectedLang);
       document.documentElement.lang = selectedLang;
       document.documentElement.setAttribute('dir', selectedLang === 'ar' ? 'rtl' : 'ltr');
-      document.querySelector('.language-text').textContent = selectedLang === 'ar' ? 'AR' : 'EN';
+      const languageText = document.querySelector('.language-text');
+      if (languageText) {
+        languageText.textContent = selectedLang === 'ar' ? 'AR' : 'EN';
+      }
       languageItems.forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
+      // Refresh dynamic content
+      setupBookCarousel();
+      setupFeaturedCollections();
+      setupQuickAccess();
     });
   });
 }
@@ -586,30 +624,43 @@ function setupSearchFunctionality() {
   const searchForm = document.getElementById('searchForm');
   const searchInput = document.getElementById('searchQuery');
   const searchSuggestions = document.querySelector('.search-suggestions');
-  if (!searchForm || !searchInput || !searchSuggestions) return;
+  if (!searchForm || !searchInput || !searchSuggestions) {
+    console.warn('Search elements missing:', { searchForm, searchInput, searchSuggestions });
+    return;
+  }
 
   searchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const query = searchInput.value.trim();
-    if (query) await performSearch(query);
+    if (query) {
+      console.log(`Submitting search: ${query}`);
+      await performSearch(query);
+    }
   });
 
   searchInput.addEventListener('input', debounce(async () => {
     const query = searchInput.value.trim();
-    if (query.length > 2) await fetchSearchSuggestions(query);
-    else clearSearchSuggestions();
+    if (query.length > 2) {
+      console.log(`Fetching suggestions for: ${query}`);
+      await fetchSearchSuggestions(query);
+    } else {
+      clearSearchSuggestions();
+    }
   }, 300));
 
   searchInput.addEventListener('focus', () => {
     const query = searchInput.value.trim();
-    if (query.length > 2) fetchSearchSuggestions(query);
-    else showRecentSearches();
+    if (query.length > 2) {
+      fetchSearchSuggestions(query);
+    } else {
+      showRecentSearches();
+    }
   });
 
   searchInput.addEventListener('keydown', (e) => {
     const suggestions = searchSuggestions.querySelectorAll('.search-suggestion-item');
     if (!suggestions.length) return;
-    
+
     const currentIndex = Array.from(suggestions).findIndex(s => s.classList.contains('selected'));
     let newIndex = currentIndex;
 
@@ -639,12 +690,15 @@ function setupSearchFunctionality() {
     if (suggestion) {
       const query = suggestion.getAttribute('data-query');
       searchInput.value = query;
+      console.log(`Suggestion clicked: ${query}`);
       performSearch(query);
     }
   });
 
   document.addEventListener('click', (e) => {
-    if (!searchForm.contains(e.target)) clearSearchSuggestions();
+    if (!searchForm.contains(e.target)) {
+      clearSearchSuggestions();
+    }
   });
 }
 
@@ -657,6 +711,7 @@ async function performSearch(query) {
   try {
     const { ok, data } = await fetchWithAuth(`/books/search?q=${encodeURIComponent(query)}`);
     if (ok) {
+      console.log(`Search successful, redirecting to catalog with query: ${query}`);
       window.location.href = `/main/catalog.html?q=${encodeURIComponent(query)}`;
     } else {
       showToast(data.message || 'Search failed.', 'error');
@@ -687,7 +742,7 @@ async function fetchSearchSuggestions(query) {
 function displaySearchSuggestions(suggestions) {
   const searchSuggestions = document.querySelector('.search-suggestions');
   if (!searchSuggestions) return;
-  
+
   searchSuggestions.innerHTML = suggestions.length === 0
     ? '<div class="search-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
     : suggestions.map((item, index) => `
@@ -696,17 +751,17 @@ function displaySearchSuggestions(suggestions) {
           ${item.title}
         </div>
       `).join('');
-  
+
   searchSuggestions.classList.add('show');
 }
 
 function showRecentSearches() {
   const searchSuggestions = document.querySelector('.search-suggestions');
   if (!searchSuggestions) return;
-  
+
   const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
   if (recentSearches.length === 0) return;
-  
+
   searchSuggestions.innerHTML = `
     <div class="p-2 text-muted" role="option">Recent searches</div>
     ${recentSearches.map((item, index) => `
@@ -716,7 +771,7 @@ function showRecentSearches() {
         </div>
       `).join('')}
   `;
-  
+
   searchSuggestions.classList.add('show');
 }
 
@@ -739,12 +794,15 @@ function clearSearchSuggestions() {
 // UI Effects
 function setupHeaderScrollEffects() {
   const header = document.querySelector('.navbar');
-  if (!header) return;
-  
+  if (!header) {
+    console.warn('Navbar element (.navbar) not found');
+    return;
+  }
+
   const handleScroll = debounce(() => {
     header.classList.toggle('scrolled', window.scrollY > 80);
   }, 10);
-  
+
   window.addEventListener('scroll', handleScroll);
 }
 
@@ -752,32 +810,37 @@ function setupSmoothScrolling() {
   document.addEventListener('click', (e) => {
     const anchor = e.target.closest('a[href^="#"], .hero-scroll-indicator');
     if (!anchor) return;
-    
+
     e.preventDefault();
     const targetId = anchor.getAttribute('href')?.substring(1) || 'features';
     if (targetId === '#') return;
-    
+
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
       const headerHeight = document.querySelector('.fixed-header')?.offsetHeight || 0;
       const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
-      
+
       window.scrollTo({
         top: targetPosition,
         behavior: 'smooth'
       });
+    } else {
+      console.warn(`Scroll target #${targetId} not found`);
     }
   });
 }
 
 function setupBackToTopButton() {
   const backToTopBtn = document.getElementById('back-to-top');
-  if (!backToTopBtn) return;
-  
+  if (!backToTopBtn) {
+    console.warn('Back to top button (#back-to-top) not found');
+    return;
+  }
+
   const handleScroll = debounce(() => {
     backToTopBtn.classList.toggle('active', window.scrollY > 300);
   }, 10);
-  
+
   window.addEventListener('scroll', handleScroll);
   backToTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -788,19 +851,19 @@ function setupCardHoverEffects() {
   document.addEventListener('mousemove', (e) => {
     const card = e.target.closest('.card, .carousel-book-card, .collection-card');
     if (!card) return;
-    
+
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     card.style.setProperty('--mouse-x', `${x}px`);
     card.style.setProperty('--mouse-y', `${y}px`);
   });
-  
+
   document.addEventListener('mouseleave', (e) => {
     const card = e.target.closest('.card, .carousel-book-card, .collection-card');
     if (!card) return;
-    
+
     card.style.removeProperty('--mouse-x');
     card.style.removeProperty('--mouse-y');
   });
@@ -810,13 +873,16 @@ function setupCardHoverEffects() {
 function setupAuthUI() {
   const authButton = document.getElementById('authButton');
   const dashboardButton = document.getElementById('dashboardButton');
-  if (!authButton || !dashboardButton) return;
+  if (!authButton || !dashboardButton) {
+    console.warn('Auth elements missing:', { authButton, dashboardButton });
+    return;
+  }
 
   function updateAuthUI() {
     const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
     const lang = localStorage.getItem('language') || 'en';
-    
+
     if (token) {
       authButton.setAttribute('data-i18n', 'nav.logout');
       authButton.textContent = translations[lang].nav.logout;
@@ -829,7 +895,7 @@ function setupAuthUI() {
       authButton.onclick = handleLogin;
       dashboardButton.style.display = 'none';
     }
-    
+
     applyLanguage(lang);
   }
 
@@ -841,6 +907,7 @@ function setupAuthUI() {
   updateAuthUI();
 
   function handleLogin() {
+    console.log('Redirecting to login page');
     window.location.href = './public/login.html';
   }
 
@@ -850,7 +917,7 @@ function setupAuthUI() {
         method: 'GET',
         credentials: 'include'
       });
-      
+
       if (ok && data.message === 'Logged out successfully') {
         localStorage.removeItem('token');
         localStorage.removeItem('userRole');
@@ -870,7 +937,10 @@ function setupAuthUI() {
 // Forms
 function setupNewsletterForm() {
   const newsletterForm = document.getElementById('newsletterForm');
-  if (!newsletterForm) return;
+  if (!newsletterForm) {
+    console.warn('Newsletter form (#newsletterForm) not found');
+    return;
+  }
 
   newsletterForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -882,9 +952,9 @@ function setupNewsletterForm() {
         method: 'POST',
         body: JSON.stringify({ email })
       });
-      
+
       if (ok) {
-        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success || 'Subscribed successfully!', 'success');
+        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success, 'success');
         newsletterForm.reset();
       } else {
         showToast(data.message || 'Subscription failed.', 'error');
@@ -898,20 +968,28 @@ function setupNewsletterForm() {
 
 function setupContactForm() {
   const contactForm = document.getElementById('contactForm');
-  if (!contactForm) return;
+  if (!contactForm) {
+    console.warn('Contact form (#contactForm) not found');
+    return;
+  }
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('contactName').value;
-    const email = document.getElementById('contactEmail').value;
-    const message = document.getElementById('contactMessage').value;
+    const name = document.getElementById('contactName')?.value;
+    const email = document.getElementById('contactEmail')?.value;
+    const message = document.getElementById('contactMessage')?.value;
+
+    if (!name || !email || !message) {
+      showToast('Please fill all contact form fields.', 'error');
+      return;
+    }
 
     try {
       const { ok, data } = await fetchWithAuth('/contact', {
         method: 'POST',
         body: JSON.stringify({ name, email, message })
       });
-      
+
       if (ok) {
         showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success, 'success');
         contactForm.reset();
@@ -928,10 +1006,13 @@ function setupContactForm() {
 // Animations and Media
 function setupIntroSection() {
   if (!window.location.pathname.includes('index.html')) return;
-  
+
   const introVideo = document.querySelector('.intro-video');
-  if (!introVideo || introVideo.tagName !== 'VIDEO') return;
-  
+  if (!introVideo || introVideo.tagName !== 'VIDEO') {
+    console.warn('Intro video (.intro-video) not found or not a video element');
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
@@ -944,7 +1025,7 @@ function setupIntroSection() {
     },
     { threshold: 0.3 }
   );
-  
+
   observer.observe(introVideo);
 }
 
@@ -956,22 +1037,25 @@ function initAnimations() {
       once: true,
       offset: 100
     });
+    console.log('AOS initialized');
+  } else {
+    console.warn('AOS library not loaded');
   }
-  
+
   document.addEventListener('click', (e) => {
     const button = e.target.closest('.btn');
     if (!button) return;
-    
+
     const rect = button.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const ripple = document.createElement('span');
     ripple.classList.add('ripple-effect');
     ripple.style.left = `${x}px`;
     ripple.style.top = `${y}px`;
     button.appendChild(ripple);
-    
+
     setTimeout(() => ripple.remove(), 500);
   });
 }
@@ -980,48 +1064,56 @@ function initAnimations() {
 function setupBookCarousel() {
   const carouselInner = document.querySelector('#bookCarousel .carousel-inner');
   const carouselIndicators = document.querySelector('#bookCarousel .carousel-indicators');
-  if (!carouselInner || !carouselIndicators) return;
+  if (!carouselInner || !carouselIndicators) {
+    console.warn('Book carousel elements missing:', { carouselInner, carouselIndicators });
+    return;
+  }
 
   async function fetchLatestBooks() {
+    carouselInner.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
     try {
+      console.log('Fetching latest books from /books/latest?limit=10');
       const { ok, data } = await fetchWithAuth('/books/latest?limit=10');
-      if (ok) {
+      if (ok && Array.isArray(data)) {
+        console.log(`Fetched ${data.length} books`);
         populateCarousel(data);
       } else {
         throw new Error(data.message || 'Failed to fetch books');
       }
     } catch (error) {
       console.error('Error fetching books:', error);
-      showToast(error.message || 'Failed to load latest books.', 'error');
+      showToast(error.message || 'Failed to load new arrivals.', 'error');
       populateCarousel(getMockBooks());
     }
   }
 
   function getMockBooks() {
+    const lang = localStorage.getItem('language') || 'en';
+    console.log('Using mock books for language:', lang);
     return [
       {
         id: '1',
-        title: 'Introduction to Quantum Computing',
+        title: translations[lang].newArrivals.quantum.title,
         authors: ['Dr. Jane Smith'],
         isbn: '978-3-16-148410-0',
         status: 'AVAILABLE',
-        coverUrl: 'https://via.placeholder.com/150'
+        coverUrl: 'https://via.placeholder.com/150?text=Quantum+Computing'
       },
       {
         id: '2',
-        title: 'Modern Historical Studies',
+        title: translations[lang].newArrivals.history.title,
         authors: ['Prof. John Doe'],
         isbn: '978-1-234-56789-0',
         status: 'CHECKED_OUT',
-        coverUrl: 'https://via.placeholder.com/150'
+        coverUrl: 'https://via.placeholder.com/150?text=Historical+Studies'
       },
       {
         id: '3',
-        title: 'Sustainable Architecture',
+        title: translations[lang].newArrivals.architecture.title,
         authors: ['Architect Lisa Brown'],
         isbn: '978-0-123-45678-9',
         status: 'AVAILABLE',
-        coverUrl: 'https://via.placeholder.com/150'
+        coverUrl: 'https://via.placeholder.com/150?text=Sustainable+Architecture'
       }
     ];
   }
@@ -1029,44 +1121,51 @@ function setupBookCarousel() {
   function populateCarousel(books) {
     carouselInner.innerHTML = '';
     carouselIndicators.innerHTML = '';
-    
+
     if (books.length === 0) {
-      carouselInner.innerHTML = '<div class="carousel-item"><p class="text-center text-white">No books available.</p></div>';
+      carouselInner.innerHTML = `
+        <div class="carousel-item active">
+          <p class="text-center text-muted py-5">No new arrivals available.</p>
+        </div>
+      `;
+      console.log('No books to display');
       return;
     }
 
     books.forEach((book, index) => {
       const isActive = index === 0 ? 'active' : '';
-      
+
       const carouselItem = document.createElement('div');
       carouselItem.className = `carousel-item ${isActive}`;
       carouselItem.innerHTML = `
         <div class="carousel-book-card mx-auto" style="max-width: 300px;">
           <div class="carousel-book-img">
-            <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}">
+            <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}" loading="lazy">
           </div>
           <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}">
             ${book.status.replace('_', ' ')}
           </div>
           <div class="carousel-book-body">
             <h3 class="carousel-book-title">${book.title}</h3>
-            <p class="carousel-book-text" data-i18n="catalog.authors">Authors: ${book.authors.join(', ')}</p>
-            <p class="carousel-book-text" data-i18n="catalog.isbn">ISBN: ${book.isbn}</p>
-            <a href="catalog.html?bookId=${book.id}" class="btn btn-details btn-glow" data-i18n="catalog.viewDetails">View Details</a>
+            <p class="carousel-book-text" data-i18n="catalog.authors">${translations[localStorage.getItem('language') || 'en'].catalog.authors}: ${book.authors.join(', ')}</p>
+            <p class="carousel-book-text" data-i18n="catalog.isbn">${translations[localStorage.getItem('language') || 'en'].catalog.isbn}: ${book.isbn}</p>
+            <a href="catalog.html?bookId=${book.id}" class="btn btn-details btn-glow" data-i18n="catalog.viewDetails">${translations[localStorage.getItem('language') || 'en'].catalog.viewDetails}</a>
           </div>
         </div>
       `;
-      
       carouselInner.appendChild(carouselItem);
 
       const indicator = document.createElement('button');
+      indicator.type = 'button';
       indicator.setAttribute('data-bs-target', '#bookCarousel');
       indicator.setAttribute('data-bs-slide-to', index);
       if (isActive) indicator.className = 'active';
       indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+      if (isActive) indicator.setAttribute('aria-current', 'true');
       carouselIndicators.appendChild(indicator);
     });
 
+    console.log(`Populated carousel with ${books.length} books`);
     applyLanguage(localStorage.getItem('language') || 'en');
   }
 
@@ -1075,12 +1174,17 @@ function setupBookCarousel() {
 
 function setupFeaturedCollections() {
   const collectionsContainer = document.querySelector('.featured-collections .glide__slides');
-  if (!collectionsContainer) return;
+  if (!collectionsContainer) {
+    console.warn('Featured collections container (.featured-collections .glide__slides) not found');
+    return;
+  }
 
   async function fetchFeaturedCollections() {
     try {
+      console.log('Fetching featured collections from /collections/featured');
       const { ok, data } = await fetchWithAuth('/collections/featured');
-      if (ok) {
+      if (ok && Array.isArray(data)) {
+        console.log(`Fetched ${data.length} collections`);
         populateCollections(data);
       } else {
         throw new Error(data.message || 'Failed to fetch collections');
@@ -1093,29 +1197,31 @@ function setupFeaturedCollections() {
   }
 
   function getMockCollections() {
+    const lang = localStorage.getItem('language') || 'en';
+    console.log('Using mock collections for language:', lang);
     return [
       {
         id: 'science',
-        title: translations[localStorage.getItem('language') || 'en'].collections.science.title,
-        description: translations[localStorage.getItem('language') || 'en'].collections.science.description,
+        title: translations[lang].collections.science.title,
+        description: translations[lang].collections.science.description,
         imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31'
       },
       {
         id: 'history',
-        title: translations[localStorage.getItem('language') || 'en'].collections.history.title,
-        description: translations[localStorage.getItem('language') || 'en'].collections.history.description,
+        title: translations[lang].collections.history.title,
+        description: translations[lang].collections.history.description,
         imageUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da'
       },
       {
         id: 'art',
-        title: translations[localStorage.getItem('language') || 'en'].collections.art.title,
-        description: translations[localStorage.getItem('language') || 'en'].collections.art.description,
+        title: translations[lang].collections.art.title,
+        description: translations[lang].collections.art.description,
         imageUrl: 'https://images.unsplash.com/photo-1515405295579-ba7b45403062'
       },
       {
         id: 'literature',
-        title: translations[localStorage.getItem('language') || 'en'].collections.literature.title,
-        description: translations[localStorage.getItem('language') || 'en'].collections.literature.description,
+        title: translations[lang].collections.literature.title,
+        description: translations[lang].collections.literature.description,
         imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd5c'
       }
     ];
@@ -1123,9 +1229,10 @@ function setupFeaturedCollections() {
 
   function populateCollections(collections) {
     collectionsContainer.innerHTML = '';
-    
+
     if (collections.length === 0) {
-      collectionsContainer.innerHTML = '<div class="glide__slide"><p class="text-center text-white">No collections available.</p></div>';
+      collectionsContainer.innerHTML = '<div class="glide__slide"><p class="text-center text-muted py-5">No collections available.</p></div>';
+      console.log('No collections to display');
       return;
     }
 
@@ -1135,13 +1242,13 @@ function setupFeaturedCollections() {
       slide.innerHTML = `
         <div class="collection-card">
           <div class="collection-img">
-            <img src="${collection.imageUrl || 'https://via.placeholder.com/300'}" alt="${collection.title}">
+            <img src="${collection.imageUrl || 'https://via.placeholder.com/300'}" alt="${collection.title}" loading="lazy">
             <div class="collection-overlay"></div>
           </div>
           <div class="collection-content">
             <h3>${collection.title}</h3>
             <p>${collection.description}</p>
-            <a href="catalog.html?collection=${collection.id}" class="btn btn-primary btn-glow">${
+            <a href="catalog.html?collection=${collection.id}" class="btn btn-primary btn-glow" data-i18n="collections.explore">${
               translations[localStorage.getItem('language') || 'en'].collections.explore
             }</a>
           </div>
@@ -1150,7 +1257,6 @@ function setupFeaturedCollections() {
       collectionsContainer.appendChild(slide);
     });
 
-    // Reinitialize Glide carousel after populating
     if (typeof Glide !== 'undefined') {
       new Glide('.featured-collections', {
         type: 'carousel',
@@ -1165,6 +1271,9 @@ function setupFeaturedCollections() {
         hoverpause: true,
         keyboard: true
       }).mount();
+      console.log('Glide carousel initialized for featured collections');
+    } else {
+      console.warn('Glide.js not loaded, featured collections carousel not initialized');
     }
 
     applyLanguage(localStorage.getItem('language') || 'en');
@@ -1175,12 +1284,17 @@ function setupFeaturedCollections() {
 
 function setupQuickAccess() {
   const quickAccessContainer = document.querySelector('.quick-access-section .row');
-  if (!quickAccessContainer) return;
+  if (!quickAccessContainer) {
+    console.warn('Quick access container (.quick-access-section .row) not found');
+    return;
+  }
 
   async function fetchQuickAccessLinks() {
     try {
+      console.log('Fetching quick access links from /quick-access');
       const { ok, data } = await fetchWithAuth('/quick-access');
-      if (ok) {
+      if (ok && Array.isArray(data)) {
+        console.log(`Fetched ${data.length} quick access links`);
         populateQuickAccess(data);
       } else {
         throw new Error(data.message || 'Failed to fetch quick access links');
@@ -1193,32 +1307,34 @@ function setupQuickAccess() {
   }
 
   function getMockQuickAccess() {
+    const lang = localStorage.getItem('language') || 'en';
+    console.log('Using mock quick access links for language:', lang);
     return [
       {
         id: 'catalog',
-        title: translations[localStorage.getItem('language') || 'en'].quickAccess.catalog.title,
-        description: translations[localStorage.getItem('language') || 'en'].quickAccess.catalog.description,
+        title: translations[lang].quickAccess.catalog.title,
+        description: translations[lang].quickAccess.catalog.description,
         url: 'catalog.html',
         icon: 'fas fa-book'
       },
       {
         id: 'databases',
-        title: translations[localStorage.getItem('language') || 'en'].quickAccess.databases.title,
-        description: translations[localStorage.getItem('language') || 'en'].quickAccess.databases.description,
+        title: translations[lang].quickAccess.databases.title,
+        description: translations[lang].quickAccess.databases.description,
         url: 'databases.html',
         icon: 'fas fa-database'
       },
       {
         id: 'hours',
-        title: translations[localStorage.getItem('language') || 'en'].quickAccess.hours.title,
-        description: translations[localStorage.getItem('language') || 'en'].quickAccess.hours.description,
+        title: translations[lang].quickAccess.hours.title,
+        description: translations[lang].quickAccess.hours.description,
         url: 'hours.html',
         icon: 'fas fa-clock'
       },
       {
         id: 'librarian',
-        title: translations[localStorage.getItem('language') || 'en'].quickAccess.librarian.title,
-        description: translations[localStorage.getItem('language') || 'en'].quickAccess.librarian.description,
+        title: translations[lang].quickAccess.librarian.title,
+        description: translations[lang].quickAccess.librarian.description,
         url: 'contact.html',
         icon: 'fas fa-user'
       }
@@ -1227,9 +1343,10 @@ function setupQuickAccess() {
 
   function populateQuickAccess(links) {
     quickAccessContainer.innerHTML = '';
-    
+
     if (links.length === 0) {
-      quickAccessContainer.innerHTML = '<p class="text-center text-muted">No quick access links available.</p>';
+      quickAccessContainer.innerHTML = '<p class="text-center text-muted py-5">No quick access links available.</p>';
+      console.log('No quick access links to display');
       return;
     }
 
@@ -1241,7 +1358,7 @@ function setupQuickAccess() {
           <i class="${link.icon} quick-access-icon"></i>
           <h3 class="quick-access-title">${link.title}</h3>
           <p class="quick-access-text">${link.description}</p>
-          <a href="${link.url}" class="btn btn-primary btn-glow">${
+          <a href="${link.url}" class="btn btn-primary btn-glow" data-i18n="quickAccess.explore">${
             translations[localStorage.getItem('language') || 'en'].quickAccess.explore
           }</a>
         </div>
@@ -1249,6 +1366,7 @@ function setupQuickAccess() {
       quickAccessContainer.appendChild(col);
     });
 
+    console.log(`Populated quick access with ${links.length} links`);
     applyLanguage(localStorage.getItem('language') || 'en');
   }
 
@@ -1257,23 +1375,28 @@ function setupQuickAccess() {
 
 // Carousels
 function setupCarousels() {
-  // Book carousel
   if (document.querySelector('#bookCarousel')) {
+    console.log('Setting up book carousel');
     setupBookCarousel();
+  } else {
+    console.warn('Book carousel (#bookCarousel) not found');
   }
-  // Featured collections carousel is handled in setupFeaturedCollections
 }
 
 // Counter Animation
 function animateCounters() {
   const counters = document.querySelectorAll('.stat-number');
+  if (!counters.length) {
+    console.warn('No stat counters (.stat-number) found');
+    return;
+  }
+
   const speed = 200;
-  
   counters.forEach(counter => {
     const target = +counter.getAttribute('data-count');
     const count = +counter.innerText;
     const increment = target / speed;
-    
+
     if (count < target) {
       counter.innerText = Math.ceil(count + increment);
       setTimeout(animateCounters, 1);
@@ -1285,6 +1408,7 @@ function animateCounters() {
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM content loaded, initializing application');
   initializeLanguage();
   setupLanguageSelector();
   setupSearchFunctionality();
@@ -1300,8 +1424,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCarousels();
   setupFeaturedCollections();
   setupQuickAccess();
-  
-  // Update auth buttons visibility
-  document.getElementById('authButton').style.display = authState.isLoggedIn ? 'none' : 'inline-block';
-  document.getElementById('dashboardButton').style.display = authState.isLoggedIn ? 'inline-block' : 'none';
+
+  const authButton = document.getElementById('authButton');
+  const dashboardButton = document.getElementById('dashboardButton');
+  if (authButton && dashboardButton) {
+    authButton.style.display = authState.isLoggedIn ? 'none' : 'inline-block';
+    dashboardButton.style.display = authState.isLoggedIn ? 'inline-block' : 'none';
+  } else {
+    console.warn('Auth buttons missing:', { authButton, dashboardButton });
+  }
 });

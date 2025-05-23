@@ -2,6 +2,32 @@
 import { API_BASE_URL } from './config.js';
 import { fetchWithAuth, showSuccess, showError } from './utils.js';
 
+// frontend/public/js/api.js
+export async function fetchWithAuth(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+
+  try {
+    const response = await fetch(`${process.env.API_URL || 'https://univ-lib-backend.onrender.com/api'}${endpoint}`, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers
+      },
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, data };
+  } catch (error) {
+    console.error(`Fetch error for ${endpoint}:`, error);
+    return { ok: false, data: { message: error.message || 'Network error' } };
+  }
+}
+
 export const login = async ({ email, password }, formElement) => {
   try {
     // Use plain fetch for public login endpoint (no auth token needed)
