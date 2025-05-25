@@ -1,4 +1,3 @@
-// frontend/public/js/main.js
 import { fetchWithAuth } from './api.js';
 
 // Constants
@@ -727,9 +726,9 @@ async function performSearch(query) {
 
 async function fetchSearchSuggestions(query) {
   try {
-    const { ok, data } = await fetchWithAuth(`/books/suggestions?q=${encodeURIComponent(query)}`);
-    if (ok) {
-      displaySearchSuggestions(data);
+    const { ok, data } = await fetchWithAuth(`/books/search?q=${encodeURIComponent(query)}`);
+    if (ok && data.books) {
+      displaySearchSuggestions(data.books);
     } else {
       clearSearchSuggestions();
     }
@@ -744,7 +743,7 @@ function displaySearchSuggestions(suggestions) {
   if (!searchSuggestions) return;
 
   searchSuggestions.innerHTML = suggestions.length === 0
-    ? '<div class="search-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
+    ? '<div class="searchрдс-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
     : suggestions.map((item, index) => `
         <div class="search-suggestion-item" data-query="${item.title}" role="option" id="suggestion-${index}" tabindex="0">
           <i class="fas fa-book me-2 text-primary"></i>
@@ -887,7 +886,7 @@ function setupAuthUI() {
       authButton.setAttribute('data-i18n', 'nav.logout');
       authButton.textContent = translations[lang].nav.logout;
       authButton.onclick = handleLogout;
-      dashboardButton.style.display = 'block';
+      dashboardButton.style.display = 'inline-block';
       dashboardButton.href = userRole === 'student' ? '/student/home.html' : '/admin-librarian/dashboard.html';
     } else {
       authButton.setAttribute('data-i18n', 'nav.login');
@@ -908,7 +907,7 @@ function setupAuthUI() {
 
   function handleLogin() {
     console.log('Redirecting to login page');
-    window.location.href = './public/login.html';
+    window.location.href = './login.html';
   }
 
   async function handleLogout() {
@@ -1097,7 +1096,7 @@ function setupBookCarousel() {
         authors: ['Dr. Jane Smith'],
         isbn: '978-3-16-148410-0',
         status: 'AVAILABLE',
-        coverUrl: 'https://via.placeholder.com/150?text=Quantum+Computing'
+        imageUrl: 'https://via.placeholder.com/150?text=Quantum+Computing'
       },
       {
         id: '2',
@@ -1105,7 +1104,7 @@ function setupBookCarousel() {
         authors: ['Prof. John Doe'],
         isbn: '978-1-234-56789-0',
         status: 'CHECKED_OUT',
-        coverUrl: 'https://via.placeholder.com/150?text=Historical+Studies'
+        imageUrl: 'https://via.placeholder.com/150?text=Historical+Studies'
       },
       {
         id: '3',
@@ -1113,7 +1112,7 @@ function setupBookCarousel() {
         authors: ['Architect Lisa Brown'],
         isbn: '978-0-123-45678-9',
         status: 'AVAILABLE',
-        coverUrl: 'https://via.placeholder.com/150?text=Sustainable+Architecture'
+        imageUrl: 'https://via.placeholder.com/150?text=Sustainable+Architecture'
       }
     ];
   }
@@ -1140,9 +1139,9 @@ function setupBookCarousel() {
       carouselItem.innerHTML = `
         <div class="carousel-book-card mx-auto" style="max-width: 300px;">
           <div class="carousel-book-img">
-            <img src="${book.coverUrl || 'https://via.placeholder.com/150'}" alt="${book.title}" loading="lazy">
+            <img src="${book.imageUrl || 'https://via.placeholder.com/150'}" alt="${book.title}" loading="lazy">
           </div>
-          <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}">
+          <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}" data-i18n="catalog.status">
             ${book.status.replace('_', ' ')}
           </div>
           <div class="carousel-book-body">
@@ -1289,58 +1288,6 @@ function setupQuickAccess() {
     return;
   }
 
-  async function fetchQuickAccessLinks() {
-    try {
-      console.log('Fetching quick access links from /quick-access');
-      const { ok, data } = await fetchWithAuth('/quick-access');
-      if (ok && Array.isArray(data)) {
-        console.log(`Fetched ${data.length} quick access links`);
-        populateQuickAccess(data);
-      } else {
-        throw new Error(data.message || 'Failed to fetch quick access links');
-      }
-    } catch (error) {
-      console.error('Error fetching quick access links:', error);
-      showToast(error.message || 'Failed to load quick access links.', 'error');
-      populateQuickAccess(getMockQuickAccess());
-    }
-  }
-
-  function getMockQuickAccess() {
-    const lang = localStorage.getItem('language') || 'en';
-    console.log('Using mock quick access links for language:', lang);
-    return [
-      {
-        id: 'catalog',
-        title: translations[lang].quickAccess.catalog.title,
-        description: translations[lang].quickAccess.catalog.description,
-        url: 'catalog.html',
-        icon: 'fas fa-book'
-      },
-      {
-        id: 'databases',
-        title: translations[lang].quickAccess.databases.title,
-        description: translations[lang].quickAccess.databases.description,
-        url: 'databases.html',
-        icon: 'fas fa-database'
-      },
-      {
-        id: 'hours',
-        title: translations[lang].quickAccess.hours.title,
-        description: translations[lang].quickAccess.hours.description,
-        url: 'hours.html',
-        icon: 'fas fa-clock'
-      },
-      {
-        id: 'librarian',
-        title: translations[lang].quickAccess.librarian.title,
-        description: translations[lang].quickAccess.librarian.description,
-        url: 'contact.html',
-        icon: 'fas fa-user'
-      }
-    ];
-  }
-
   function populateQuickAccess(links) {
     quickAccessContainer.innerHTML = '';
 
@@ -1370,7 +1317,40 @@ function setupQuickAccess() {
     applyLanguage(localStorage.getItem('language') || 'en');
   }
 
-  fetchQuickAccessLinks();
+  // Use mock data as no public endpoint is defined for quick access
+  const lang = localStorage.getItem('language') || 'en';
+  console.log('Using mock quick access links for language:', lang);
+  const quickAccessLinks = [
+    {
+      id: 'catalog',
+      title: translations[lang].quickAccess.catalog.title,
+      description: translations[lang].quickAccess.catalog.description,
+      url: 'catalog.html',
+      icon: 'fas fa-book'
+    },
+    {
+      id: 'databases',
+      title: translations[lang].quickAccess.databases.title,
+      description: translations[lang].quickAccess.databases.description,
+      url: 'databases.html',
+      icon: 'fas fa-database'
+    },
+    {
+      id: 'hours',
+      title: translations[lang].quickAccess.hours.title,
+      description: translations[lang].quickAccess.hours.description,
+      url: 'hours.html',
+      icon: 'fas fa-clock'
+    },
+    {
+      id: 'librarian',
+      title: translations[lang].quickAccess.librarian.title,
+      description: translations[lang].quickAccess.librarian.description,
+      url: 'contact.html',
+      icon: 'fas fa-user'
+    }
+  ];
+  populateQuickAccess(quickAccessLinks);
 }
 
 // Carousels

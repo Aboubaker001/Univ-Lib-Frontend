@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
   <script src="https://unpkg.com/i18next-browser-languagedetector@7.1.0/i18nextBrowserLanguageDetector.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
+
 <body>
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
@@ -22,7 +24,8 @@
     <center>
       <div class="language-toggle-container">
         <br>
-        <button id="language-toggle" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full transition duration-200">
+        <button id="language-toggle"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full transition duration-200">
           EN
         </button>
       </div>
@@ -30,11 +33,15 @@
     <nav class="sidebar-nav">
       <ul>
         <li><a href="./librarian-dashboard.html" data-i18n="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-        <li><a href="./admin-librarians.html" data-i18n="manageLibrarians"><i class="fas fa-user-tie"></i> Manage Librarians</a></li>
-        <li><a href="./admin-students.html" data-i18n="manageStudents"><i class="fas fa-user-graduate"></i> Manage Students</a></li>
+        <li><a href="./admin-librarians.html" data-i18n="manageLibrarians"><i class="fas fa-user-tie"></i> Manage
+            Librarians</a></li>
+        <li><a href="./admin-students.html" data-i18n="manageStudents"><i class="fas fa-user-graduate"></i> Manage
+            Students</a></li>
         <li><a href="./admin-books.html" data-i18n="manageBooks"><i class="fas fa-book"></i> Manage Books</a></li>
-        <li><a href="./admin-reservations.html" data-i18n="manageReservations"><i class="fas fa-calendar-check"></i> Manage Reservations</a></li>
-        <li><a href="./librarian-fines.html" data-i18n="manageFines"><i class="fas fa-money-bill"></i> Manage Fines</a></li>
+        <li><a href="./admin-reservations.html" data-i18n="manageReservations"><i class="fas fa-calendar-check"></i>
+            Manage Reservations</a></li>
+        <li><a href="./librarian-fines.html" data-i18n="manageFines"><i class="fas fa-money-bill"></i> Manage Fines</a>
+        </li>
         <li><a href="../admin-librarian/home.html" data-i18n="homepage"><i class="fas fa-globe"></i> Homepage</a></li>
         <li><a href="#" id="logout" data-i18n="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
       </ul>
@@ -50,18 +57,27 @@
           <div class="card animate-slide-up">
             <div class="card-header">
               <h3 class="card-title" data-i18n="bookManagement">Book Management</h3>
-              <button id="addBookBtn" class="btn btn-primary btn-sm" data-i18n="addBook"><i class="fas fa-plus"></i> Add New Book</button>
+              <button id="addBookBtn" class="btn btn-primary btn-sm" data-i18n="addBook"><i class="fas fa-plus"></i> Add
+                New Book</button>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th data-i18n="title">Title</th>
-                      <th data-i18n="isbn">ISBN</th>
-                      <th data-i18n="status">Status</th>
-                      <th data-i18n="authors">Authors</th>
-                      <th data-i18n="actions">Actions</th>
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th data-i18n="title">Title</th>
+                            <th data-i18n="isbn">ISBN</th>
+                            <th data-i18n="status">Status</th>
+                            <th data-i18n="authors">Authors</th>
+                            <th data-i18n="coverImage">Cover Image</th>
+                            <th data-i18n="actions">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="bookTableBody"></tbody>
+                      </table>
                     </tr>
                   </thead>
                   <tbody id="bookTableBody">
@@ -76,126 +92,130 @@
     </div>
   </div>
 
-  <!-- Add/Edit Book Modal -->
-  <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="bookModalLabel" data-i18n="addBook">Add New Book</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="bookForm" enctype="multipart/form-data">
-            <input type="hidden" id="bookId">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="isbn" class="form-label" data-i18n="isbn">ISBN</label>
-                <input type="text" class="form-control" id="isbn" name="isbn" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="title" class="form-label" data-i18n="title">Title</label>
-                <input type="text" class="form-control" id="title" name="title" required>
-              </div>
+<!-- Add/Edit Book Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookModalLabel" data-i18n="addBook">Add New Book</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="bookForm" enctype="multipart/form-data">
+          <input type="hidden" id="bookId" name="bookId">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="isbn" class="form-label" data-i18n="isbn">ISBN</label>
+              <input type="text" class="form-control" id="isbn" name="isbn" required aria-required="true">
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="edition" class="form-label" data-i18n="edition">Edition</label>
-                <input type="text" class="form-control" id="edition" name="edition" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="publisher" class="form-label" data-i18n="publisher">Publisher</label>
-                <input type="text" class="form-control" id="publisher" name="publisher" required>
-              </div>
+            <div class="col-md-6 mb-3">
+              <label for="title" class="form-label" data-i18n="title">Title</label>
+              <input type="text" class="form-control" id="title" name="title" required aria-required="true">
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="publicationYear" class="form-label" data-i18n="publicationYear">Publication Year</label>
-                <input type="number" class="form-control" id="publicationYear" name="publicationYear" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="pageCount" class="form-label" data-i18n="pageCount">Page Count</label>
-                <input type="number" class="form-control" id="pageCount" name="pageCount" required>
-              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="edition" class="form-label" data-i18n="edition">Edition</label>
+              <input type="text" class="form-control" id="edition" name="edition">
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="language" class="form-label" data-i18n="language">Language</label>
-                <input type="text" class="form-control" id="language" name="language" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="digitalCopyUrl" class="form-label" data-i18n="digitalCopyUrl">Digital Copy URL</label>
-                <input type="url" class="form-control" id="digitalCopyUrl" name="digitalCopyUrl" required>
-              </div>
+            <div class="col-md-6 mb-3">
+              <label for="publisher" class="form-label" data-i18n="publisher">Publisher</label>
+              <input type="text" class="form-control" id="publisher" name="publisher">
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="authors" class="form-label" data-i18n="authors">Authors (comma-separated)</label>
-                <input type="text" class="form-control" id="authors" name="authors" placeholder="Author1, Author2">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="keywords" class="form-label" data-i18n="keywords">Keywords (comma-separated)</label>
-                <input type="text" class="form-control" id="keywords" name="keywords" placeholder="keyword1, keyword2">
-              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="publicationYear" class="form-label" data-i18n="publicationYear">Publication Year</label>
+              <input type="number" class="form-control" id="publicationYear" name="publicationYear" min="1500" max="2100">
             </div>
-            <div class="mb-3">
-              <label for="status" class="form-label" data-i18n="status">Status</label>
-              <select class="form-select" id="status" name="status">
-                <option value="AVAILABLE" data-i18n="available">Available</option>
-                <option value="CHECKED_OUT" data-i18n="checkedOut">Checked Out</option>
-                <option value="RESERVED" data-i18n="reserved">Reserved</option>
-                <option value="UNDER_MAINTENANCE" data-i18n="underMaintenance">Under Maintenance</option>
-                <option value="LOST" data-i18n="lost">Lost</option>
-              </select>
+            <div class="col-md-6 mb-3">
+              <label for="pageCount" class="form-label" data-i18n="pageCount">Page Count</label>
+              <input type="number" class="form-control" id="pageCount" name="pageCount" min="1">
             </div>
-            <div class="mb-3">
-              <label for="coverImage" class="form-label" data-i18n="coverImage">Cover Image</label>
-              <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/png,image/jpeg,image/jpg">
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="language" class="form-label" data-i18n="language">Language</label>
+              <input type="text" class="form-control" id="language" name="language">
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
-          <button type="submit" form="bookForm" class="btn btn-primary" id="saveBookBtn" data-i18n="saveBook">Save Book</button>
-        </div>
+            <div class="col-md-6 mb-3">
+              <label for="digitalCopyUrl" class="form-label" data-i18n="digitalCopyUrl">Digital Copy URL</label>
+              <input type="url" class="form-control" id="digitalCopyUrl" name="digitalCopyUrl">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="authors" class="form-label" data-i18n="authors">Authors (comma-separated)</label>
+              <input type="text" class="form-control" id="authors" name="authors" placeholder="Author1, Author2">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="keywords" class="form-label" data-i18n="keywords">Keywords (comma-separated)</label>
+              <input type="text" class="form-control" id="keywords" name="keywords" placeholder="keyword1, keyword2">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label" data-i18n="status">Status</label>
+            <select class="form-select" id="status" name="status" aria-describedby="statusHelp">
+              <option value="AVAILABLE" data-i18n="available"></option>
+              <option value="CHECKED_OUT" data-i18n="checkedOut"></option>
+              <option value="RESERVED" data-i18n="reserved"></option>
+              <option value="UNDER_MAINTENANCE" data-i18n="underMaintenance"></option>
+              <option value="LOST" data-i18n="lost"></option>
+            </select>
+            <small id="statusHelp" class="form-text text-muted" data-i18n="statusHelp">Select the current status of the book.</small>
+          </div>
+          <div class="mb-3">
+            <label for="coverImage" class="form-label" data-i18n="coverImage">Cover Image</label>
+            <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/png,image/jpeg,image/jpg">
+            <small class="form-text text-muted" data-i18n="coverImageHelp">Upload a PNG or JPEG image, or provide a URL in the Digital Copy URL field.</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+            <button type="submit" class="btn btn-primary" id="saveBookBtn" data-i18n="saveBook">Save Book</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/control-dashboard.js"></script>
- <script>
-      (function () {
-        function c() {
-          var b = a.contentDocument || a.contentWindow.document;
-          if (b) {
-            var d = b.createElement("script");
-            d.innerHTML =
-              "window.__CF$cv$params={r:'93e828649a78bf82',t:'MTc0NzAzNDQ3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-            b.getElementsByTagName("head")[0].appendChild(d);
-          }
+  <script>
+    (function () {
+      function c() {
+        var b = a.contentDocument || a.contentWindow.document;
+        if (b) {
+          var d = b.createElement("script");
+          d.innerHTML =
+            "window.__CF$cv$params={r:'93e828649a78bf82',t:'MTc0NzAzNDQ3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+          b.getElementsByTagName("head")[0].appendChild(d);
         }
-        if (document.body) {
-          var a = document.createElement("iframe");
-          a.height = 1;
-          a.width = 1;
-          a.style.position = "absolute";
-          a.style.top = 0;
-          a.style.left = 0;
-          a.style.border = "none";
-          a.style.visibility = "hidden";
-          document.body.appendChild(a);
-          if ("loading" !== document.readyState) c();
-          else if (window.addEventListener)
-            document.addEventListener("DOMContentLoaded", c);
-          else {
-            var e = document.onreadystatechange || function () {};
-            document.onreadystatechange = function (b) {
-              e(b);
-              "loading" !== document.readyState &&
-                ((document.onreadystatechange = e), c());
-            };
-          }
+      }
+      if (document.body) {
+        var a = document.createElement("iframe");
+        a.height = 1;
+        a.width = 1;
+        a.style.position = "absolute";
+        a.style.top = 0;
+        a.style.left = 0;
+        a.style.border = "none";
+        a.style.visibility = "hidden";
+        document.body.appendChild(a);
+        if ("loading" !== document.readyState) c();
+        else if (window.addEventListener)
+          document.addEventListener("DOMContentLoaded", c);
+        else {
+          var e = document.onreadystatechange || function () { };
+          document.onreadystatechange = function (b) {
+            e(b);
+            "loading" !== document.readyState &&
+              ((document.onreadystatechange = e), c());
+          };
         }
-      })();
-    </script></body>
+      }
+    })();
+  </script>
+</body>
+
 </html>

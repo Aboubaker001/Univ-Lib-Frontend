@@ -1,8 +1,6 @@
-// frontend/public/js/api.js
 import { API_BASE_URL } from './config.js';
-import { fetchWithAuth, showSuccess, showError } from './utils.js';
+import { showSuccess, showError } from './utils.js';
 
-// frontend/public/js/api.js
 export async function fetchWithAuth(endpoint, options = {}) {
   const token = localStorage.getItem('token');
   const headers = {
@@ -11,7 +9,7 @@ export async function fetchWithAuth(endpoint, options = {}) {
   };
 
   try {
-    const response = await fetch(`${'https://univ-lib-backend.onrender.com/api'}${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         ...headers,
@@ -19,6 +17,12 @@ export async function fetchWithAuth(endpoint, options = {}) {
       },
       credentials: 'include'
     });
+
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Server returned non-JSON response');
+    }
 
     const data = await response.json();
     return { ok: response.ok, data };
@@ -30,7 +34,6 @@ export async function fetchWithAuth(endpoint, options = {}) {
 
 export const login = async ({ email, password }, formElement) => {
   try {
-    // Use plain fetch for public login endpoint (no auth token needed)
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
@@ -43,28 +46,31 @@ export const login = async ({ email, password }, formElement) => {
     });
 
     clearTimeout(timeoutId);
-    const data = await response.json();
 
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Server returned non-JSON response');
+    }
+
+    const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message || 'Login failed');
     }
 
-    localStorage.setItem('token', data.token);
+    localStorage.setItem('token', data.data);
     localStorage.setItem('userRole', data.role);
 
-    // Show success message
     showSuccess(formElement, 'Login successful! Redirecting...');
 
-    // Redirect based on role
     setTimeout(() => {
-      if (data.role === 'admin' || data.role === 'librarian') {
+      if (data.role === 'ADMIN' || data.role === 'LIBRARIAN') {
         window.location.href = '/admin-librarian/dashboard.html';
-      } else if (data.role === 'student') {
+      } else if (data.role === 'STUDENT') {
         window.location.href = '/student/home.html';
       } else {
         window.location.href = '/main/home.html';
       }
-    }, 1000); // Delay redirect to show success message
+    }, 1000);
 
     return { ok: true, role: data.role };
   } catch (error) {
@@ -76,7 +82,6 @@ export const login = async ({ email, password }, formElement) => {
 
 export const registerUser = async (formData, formElement) => {
   try {
-    // Use plain fetch for public register endpoint
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 

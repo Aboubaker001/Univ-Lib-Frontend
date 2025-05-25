@@ -147,6 +147,13 @@ const api = {
         body: JSON.stringify({ email, password }),
         credentials: 'include'
       });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(translations[i18next.language].serverError);
+      }
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || translations[i18next.language].serverError);
@@ -154,15 +161,15 @@ const api = {
       if (!['ADMIN', 'LIBRARIAN', 'STUDENT'].includes(data.role)) {
         throw new Error(translations[i18next.language].invalidData);
       }
-      localStorage.setItem('token', data.data);//data.token
+      localStorage.setItem('token', data.data); // Use data.data for token
       localStorage.setItem('userRole', data.role);
       return { ok: true, role: data.role };
     } catch (error) {
-      console.log(error)
+      console.error('Login error:', error);
       return { ok: false, message: error.message };
     }
   },
-  registerUser: async (formData) => {
+    registerUser: async (formData) => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: 'POST',
