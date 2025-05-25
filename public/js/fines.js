@@ -188,7 +188,7 @@ async function markPaid(id) {
   document.getElementById('confirmModalBody').textContent = 'Are you sure you want to mark this fine as paid?';
   document.getElementById('confirmActionBtn').onclick = async () => {
     try {
-      const response = await fetch(`${API_URL}/fine/${id}`, {
+      const response = await fetch(`${API_URL}/fines/${id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -214,7 +214,7 @@ async function deleteFine(id) {
   document.getElementById('confirmModalBody').textContent = 'Are you sure you want to delete this fine?';
   document.getElementById('confirmActionBtn').onclick = async () => {
     try {
-      const response = await fetch(`${API_URL}/fine/${id}`, {
+      const response = await fetch(`${API_URL}/fines/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });

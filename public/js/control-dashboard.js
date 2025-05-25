@@ -317,7 +317,7 @@ const setupSidebar = () => {
 // API Functions
 const getAllUsers = async () => {
   try {
-    const response = await fetch(`${API_URL}/user`, {
+    const response = await fetch(`${API_URL}/users`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch users');
@@ -328,9 +328,9 @@ const getAllUsers = async () => {
   }
 };
 
-const signup = async (formData) => {
+const register = async (formData) => {
   try {
-    const response = await fetch(`${API_URL}/user/signup`, {
+    const response = await fetch(`${API_URL}/user/register`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       body: formData
@@ -345,7 +345,7 @@ const signup = async (formData) => {
 
 const createBook = async (data) => {
   try {
-    const response = await fetch(`${API_URL}/book`, {
+    const response = await fetch(`${API_URL}/books`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -363,7 +363,7 @@ const createBook = async (data) => {
 
 const updateBook = async (bookId, data) => {
   try {
-    const response = await fetch(`${API_URL}/book/${bookId}`, {
+    const response = await fetch(`${API_URL}/books/${bookId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -381,7 +381,7 @@ const updateBook = async (bookId, data) => {
 
 const deleteBook = async (bookId) => {
   try {
-    const response = await fetch(`${API_URL}/book/${bookId}`, {
+    const response = await fetch(`${API_URL}/books/${bookId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
@@ -397,7 +397,7 @@ const uploadBookImage = async (bookId, imageFile) => {
   const formData = new FormData();
   formData.append('image', imageFile);
   try {
-    const response = await fetch(`${API_URL}/book/image/${bookId}`, {
+    const response = await fetch(`${API_URL}/books/image/${bookId}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       body: formData
@@ -412,7 +412,7 @@ const uploadBookImage = async (bookId, imageFile) => {
 
 const getAllReservations = async () => {
   try {
-    const response = await fetch(`${API_URL}/reservation`, {
+    const response = await fetch(`${API_URL}/reservations`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch reservations');
@@ -425,7 +425,7 @@ const getAllReservations = async () => {
 
 const updateReservation = async (reservationId, status) => {
   try {
-    const response = await fetch(`${API_URL}/reservation/${reservationId}`, {
+    const response = await fetch(`${API_URL}/reservations/${reservationId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -443,7 +443,7 @@ const updateReservation = async (reservationId, status) => {
 
 const getAllFines = async () => {
   try {
-    const response = await fetch(`${API_URL}/fine`, {
+    const response = await fetch(`${API_URL}/fines`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch fines');
@@ -456,7 +456,7 @@ const getAllFines = async () => {
 
 const updateFine = async (fineId, status) => {
   try {
-    const response = await fetch(`${API_URL}/fine/${fineId}`, {
+    const response = await fetch(`${API_URL}/fines/${fineId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -483,7 +483,7 @@ const checkAuth = async (restrictToAdmin = false) => {
     return false;
   }
   try {
-    const response = await fetch(`${API_URL}/user/me`, {
+    const response = await fetch(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Unauthorized');
@@ -520,7 +520,7 @@ const checkAuth = async (restrictToAdmin = false) => {
 // Book Management
 const loadBooks = async () => {
   try {
-    const response = await fetch(`${API_URL}/book/all`, {
+    const response = await fetch(`${API_URL}/books/all`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch books');
@@ -613,7 +613,7 @@ const setupBookForm = () => {
 
 const editBook = async (bookId) => {
   try {
-    const response = await fetch(`${API_URL}/book/${bookId}`, {
+    const response = await fetch(`${API_URL}/books/${bookId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch book');

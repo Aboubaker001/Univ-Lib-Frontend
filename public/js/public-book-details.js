@@ -73,7 +73,7 @@ async function loadBookDetails() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/book/${bookId}`);
+    const response = await fetch(`${API_URL}/books/${bookId}`);
     if (!response.ok) throw new Error('Failed to fetch book details');
     const { data } = await response.json();
     displayBookDetails(data);

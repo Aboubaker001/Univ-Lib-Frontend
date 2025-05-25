@@ -490,7 +490,7 @@ async function initReservations() {
 
 async function loadReservations() {
   try {
-    const response = await fetch(`${API_URL}/reservation/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/reservations/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch reservations');
     const { data } = await response.json();
     displayReservations(data);
@@ -506,7 +506,7 @@ async function displayReservations(reservations) {
 
   for (const res of reservations) {
     try {
-      const bookResponse = await fetch(`${API_URL}/book/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const bookResponse = await fetch(`${API_URL}/books/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: book } = await bookResponse.json();
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -531,7 +531,7 @@ window.cancelReservation = async function(id, title) {
   const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
   document.getElementById('confirmCancelBtn').onclick = async () => {
     try {
-      const response = await fetch(`${API_URL}/reservation/${id}`, {
+      const response = await fetch(`${API_URL}/reservations/${id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -560,7 +560,7 @@ async function initFines() {
 
 async function loadFines() {
   try {
-    const response = await fetch(`${API_URL}/fine/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/fines/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch fines');
     const { data } = await response.json();
     displayFines(data);
@@ -576,9 +576,9 @@ async function displayFines(fines) {
 
   for (const fine of fines) {
     try {
-      const resResponse = await fetch(`${API_URL}/reservation/${fine.reservationId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const resResponse = await fetch(`${API_URL}/reservations/${fine.reservationId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: res } = await resResponse.json();
-      const bookResponse = await fetch(`${API_URL}/book/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const bookResponse = await fetch(`${API_URL}/books/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: book } = await bookResponse.json();
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -605,7 +605,7 @@ async function initProfile() {
 
 async function loadProfile() {
   try {
-    const response = await fetch(`${API_URL}/user/`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/users/`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch profile');
     const { data } = await response.json();
 
@@ -669,7 +669,7 @@ document.addEventListener('submit', (e) => {
     const profilePic = document.getElementById('idProfilePic').files[0];
     if (profilePic) formData.append('idProfilePic', profilePic);
 
-    fetch(`${API_URL}/user/`, {
+    fetch(`${API_URL}/users/`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       body: formData
@@ -704,7 +704,7 @@ async function initBorrow() {
       const bookId = document.getElementById('bookId').value;
 
       try {
-        const response = await fetch(`${API_URL}/reservation`, {
+        const response = await fetch(`${API_URL}/reservations`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -733,7 +733,7 @@ async function loadBooksForBorrow() {
   if (!select) return;
 
   try {
-    const response = await fetch(`${API_URL}/book/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/books/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     const { data } = await response.json();
     select.innerHTML = `<option value="" disabled selected data-i18n="selectBook">${i18next.t('selectBook')}</option>` +
       data.filter(book => book.status === 'AVAILABLE').map(book => `<option value="${book.id}">${book.title}</option>`).join('');
@@ -748,7 +748,7 @@ async function loadBorrowRequests() {
   if (!list) return;
 
   try {
-    const response = await fetch(`${API_URL}/reservation/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/reservations/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     const { data } = await response.json();
     const userId = JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id;
     const requests = data.filter(r => r.userId === userId && r.status === 'PENDING');
@@ -781,7 +781,7 @@ function setupRequestActions() {
       const bookSelect = document.getElementById('edit-bookId');
 
       try {
-        const response = await fetch(`${API_URL}/book/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+        const response = await fetch(`${API_URL}/books/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
         const { data } = await response.json();
         bookSelect.innerHTML = data.filter(book => book.status === 'AVAILABLE').map(book => `
           <option value="${book.id}" ${book.id === currentBookId ? 'selected' : ''}>${book.title}</option>
@@ -800,7 +800,7 @@ function setupRequestActions() {
         const newBookId = bookSelect.value;
 
         try {
-          const response = await fetch(`${API_URL}/reservation/${requestId}`, {
+          const response = await fetch(`${API_URL}/reservations/${requestId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -828,7 +828,7 @@ function setupRequestActions() {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
       try {
-        const response = await fetch(`${API_URL}/reservation/${id}`, {
+        const response = await fetch(`${API_URL}/reservations/${id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
@@ -871,7 +871,7 @@ async function loadBorrowedBooks() {
   if (!list) return;
 
   try {
-    const response = await fetch(`${API_URL}/reservation/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/reservations/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     const { data } = await response.json();
     const userId = JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id;
     const borrowed = data.filter(r => r.userId === userId && r.status === 'CONFIRMED');

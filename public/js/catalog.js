@@ -129,37 +129,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Perform catalog search
-    function performCatalogSearch(query, filters) {
-        if (!query && filters.category === 'all' && filters.format === 'all' && filters.availability === 'all') return;
-        const searchForm = document.getElementById('catalogSearchForm');
-        if (searchForm) searchForm.classList.add('search-loading');
-        addToRecentSearches(query);
-        // TODO: Replace with actual API call
-        // Example: fetch(`${API_BASE_URL}/catalog/search?q=${encodeURIComponent(query)}&category=${filters.category}&format=${filters.format}&availability=${filters.availability}`)
-        setTimeout(() => {
-            const mockResults = [
-                {
-                    id: '1',
-                    category: 'science',
-                    title: 'Introduction to Quantum Computing',
-                    author: 'Dr. Jane Smith',
-                    status: 'available',
-                    image: 'https://images.unsplash.com/photo-1589994965851-a8f43a9d939c'
-                },
-                {
-                    id: '2',
-                    category: 'history',
-                    title: 'Modern Historical Studies',
-                    author: 'Edited by Prof. John Doe',
-                    status: 'checked-out',
-                    image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73'
-                }
-            ];
-            displayCatalogResults(mockResults);
-            if (searchForm) searchForm.classList.remove('search-loading');
-            clearSearchSuggestions();
-        }, 600);
-    }
+    // function performCatalogSearch(query, filters) {
+    //     if (!query && filters.category === 'all' && filters.format === 'all' && filters.availability === 'all') return;
+    //     const searchForm = document.getElementById('catalogSearchForm');
+    //     if (searchForm) searchForm.classList.add('search-loading');
+    //     addToRecentSearches(query);
+    //     // TODO: Replace with actual API call
+    //     // Example: fetch(`${API_BASE_URL}/catalog/search?q=${encodeURIComponent(query)}&category=${filters.category}&format=${filters.format}&availability=${filters.availability}`)
+    //     setTimeout(() => {
+    //         const mockResults = [
+    //             {
+    //                 id: '1',
+    //                 category: 'science',
+    //                 title: 'Introduction to Quantum Computing',
+    //                 author: 'Dr. Jane Smith',
+    //                 status: 'available',
+    //                 image: 'https://images.unsplash.com/photo-1589994965851-a8f43a9d939c'
+    //             },
+    //             {
+    //                 id: '2',
+    //                 category: 'history',
+    //                 title: 'Modern Historical Studies',
+    //                 author: 'Edited by Prof. John Doe',
+    //                 status: 'checked-out',
+    //                 image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73'
+    //             }
+    //         ];
+    //         displayCatalogResults(mockResults);
+    //         if (searchForm) searchForm.classList.remove('search-loading');
+    //         clearSearchSuggestions();
+    //     }, 600);
+    // }
 
     // Fetch search suggestions (mock)
     function fetchSearchSuggestions(query) {

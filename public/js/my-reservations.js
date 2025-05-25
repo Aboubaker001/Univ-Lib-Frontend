@@ -76,7 +76,7 @@ async function checkAuth() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/user/`, {
+    const response = await fetch(`${API_URL}/users/`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Unauthorized');
@@ -95,7 +95,7 @@ async function checkAuth() {
 // Load reservations
 async function loadReservations() {
   try {
-    const response = await fetch(`${API_URL}/reservation/user`, {
+    const response = await fetch(`${API_URL}/reservations/user`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch reservations');
@@ -114,7 +114,7 @@ async function displayReservations(reservations) {
 
   for (const res of reservations) {
     try {
-      const bookResponse = await fetch(`${API_URL}/book/${res.bookId}`, {
+      const bookResponse = await fetch(`${API_URL}/boosk/${res.bookId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const { data: book } = await bookResponse.json();
@@ -143,7 +143,7 @@ async function cancelReservation(id, title) {
   const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
   document.getElementById('confirmCancelBtn').onclick = async () => {
     try {
-      const response = await fetch(`${API_URL}/reservation/${id}`, {
+      const response = await fetch(`${API_URL}/reservations/${id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

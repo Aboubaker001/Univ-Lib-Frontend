@@ -79,7 +79,7 @@ async function checkAuth() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/user/`, {
+    const response = await fetch(`${API_URL}/users/`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Unauthorized');
@@ -98,7 +98,7 @@ async function checkAuth() {
 // Load books
 async function loadBooks(query = '') {
   try {
-    const response = await fetch(`${API_URL}/book/all`, {
+    const response = await fetch(`${API_URL}/books/all`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch books');
@@ -159,7 +159,7 @@ document.getElementById('reserveForm').addEventListener('submit', async (e) => {
   const returnDate = document.getElementById('returnDate').value;
 
   try {
-    const response = await fetch(`${API_URL}/reservation/`, {
+    const response = await fetch(`${API_URL}/reservations/`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,

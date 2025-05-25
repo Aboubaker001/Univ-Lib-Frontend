@@ -34,7 +34,7 @@ export const login = async ({ email, password }, formElement) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(`${API_BASE_URL}/user/login`, {
+    const response = await fetch(`${API_BASE_URL}/users/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -80,7 +80,7 @@ export const registerUser = async (formData, formElement) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(`${API_BASE_URL}/user/register`, {
+    const response = await fetch(`${API_BASE_URL}/users/register`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
