@@ -330,7 +330,7 @@ const getAllUsers = async () => {
 
 const register = async (formData) => {
   try {
-    const response = await fetch(`${API_URL}/user/register`, {
+    const response = await fetch(`${API_URL}/users/register`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       body: formData
@@ -344,11 +344,12 @@ const register = async (formData) => {
 };
 
 const createBook = async (data) => {
+  console.log(data)
   try {
     const response = await fetch(`${API_URL}/books`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
@@ -412,8 +413,12 @@ const uploadBookImage = async (bookId, imageFile) => {
 
 const getAllReservations = async () => {
   try {
-    const response = await fetch(`${API_URL}/reservations`, {
+    const response = await fetch(`${API_URL}/reservations/all`, {
+
+      headers: { Authorization: `${localStorage.getItem('token')}` },
+
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+
     });
     if (!response.ok) throw new Error('Failed to fetch reservations');
     return await response.json();
@@ -443,8 +448,12 @@ const updateReservation = async (reservationId, status) => {
 
 const getAllFines = async () => {
   try {
-    const response = await fetch(`${API_URL}/fines`, {
+    const response = await fetch(`${API_URL}/fines/all`, {
+
+      headers: { Authorization: `${localStorage.getItem('token')}` },
+
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+
     });
     if (!response.ok) throw new Error('Failed to fetch fines');
     return await response.json();
@@ -474,48 +483,95 @@ const updateFine = async (fineId, status) => {
 
 // Authentication
 let currentUserRole = null;
+let isAuthenticating = false;
 
 const checkAuth = async (restrictToAdmin = false) => {
+  if (isAuthenticating) {
+    console.log('checkAuth: Already authenticating, skipping');
+    return false;
+  }
+  isAuthenticating = true;
   const token = localStorage.getItem('token');
+  console.log('checkAuth: Token from localStorage:', token);
   if (!token) {
-    console.log('No token found, redirecting to ./login.html');
-    window.location.href = './login.html';
+    console.log('checkAuth: No token found, redirecting to /main/login.html');
+    // window.location.href = '../login.html';
+    isAuthenticating = false;
     return false;
   }
   try {
+    console.log('checkAuth: Fetching /users/me');
     const response = await fetch(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error('Unauthorized');
+    console.log('checkAuth: Response status:', response.status);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.log('checkAuth: Error response:', errorData);
+      throw new Error(`Unauthorized: ${errorData.msg}`);
+    }
     const { data } = await response.json();
-    console.log('Auth check response:', data);
+    console.log('checkAuth: User data:', data);
     currentUserRole = data.role;
     if (restrictToAdmin && data.role !== 'ADMIN') {
+      console.log('checkAuth: Non-admin role detected:', data.role);
       showError(document.querySelector('.main-content'), i18next.t('accessDeniedAdmin'));
       window.location.href = data.role === 'LIBRARIAN' ? '/admin-librarian/librarian-dashboard.html' : '/student/student-dashboard.html';
+      isAuthenticating = false;
       return false;
     }
     if (data.role === 'STUDENT') {
-      console.log('Student role detected, redirecting to /student/student-dashboard.html');
+      console.log('checkAuth: Student role detected, redirecting to /student/student-dashboard.html');
       window.location.href = '/student/student-dashboard.html';
+      isAuthenticating = false;
       return false;
     }
     if (!['ADMIN', 'LIBRARIAN'].includes(data.role)) {
+      console.log('checkAuth: Invalid role detected:', data.role);
       showError(document.querySelector('.main-content'), i18next.t('accessDeniedRole'));
-      console.log('Invalid role detected, redirecting to ./login.html');
-      window.location.href = './login.html';
+      // window.location.href = '../login.html';
+      // isAuthenticating = false;
       return false;
     }
+    console.log('checkAuth: Authentication successful, role:', data.role);
+    isAuthenticating = false;
     return true;
   } catch (error) {
-    console.error('Auth error:', error);
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    console.log('Auth failed, redirecting to ./login.html');
-    window.location.href = './login.html';
+    console.error('checkAuth: Auth error:', error.message);
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('userRole');
+    // console.log('checkAuth: Auth failed, redirecting to /main/login.html');
+    // window.location.href = '../login.html';
+    isAuthenticating = false;
     return false;
   }
 };
+
+const fetchWithoutAuth = async (url) => {
+  try {
+    const response = await fetch(`${API_URL}${url}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Fetch error for ${url}:`, error);
+    return { ok: false, data: null, error: error.message };
+  }
+};
+
+
+// Usage example
+console.log('Fetching latest books from /books/latest?limit=10');
+const { ok, data } = await fetchWithoutAuth('/books/latest?limit=10');
+if (ok && data) {
+  console.log('Latest books:', data);
+} else {
+  console.log('Failed to fetch latest books:', data?.error);
+}
 
 // Book Management
 const loadBooks = async () => {
@@ -697,6 +753,7 @@ const loadStudents = async () => {
 };
 
 const displayStudents = (students) => {
+  console.log(students)
   const tbody = document.getElementById('student-list');
   if (!tbody) return;
   tbody.innerHTML = '';
@@ -706,7 +763,7 @@ const displayStudents = (students) => {
       <td>${student.firstName} ${student.familyName}</td>
       <td>${student.studentId}</td>
       <td>${student.email}</td>
-      <td><span class="badge badge-${student.status === 'ACTIVE' ? 'success' : 'danger'}">${student.status}</span></td>
+      <td><span class="badge badge-${student.isVerified  ? 'success' : 'danger'}">${student.isVerified ? "Active" : "Inactive"}</span></td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="controlDashboard.editStudent('${student.id}')"><i class="fas fa-edit"></i> <span data-i18n="edit">Edit</span></button>
         <button class="btn btn-sm btn-outline-danger me-1" onclick="controlDashboard.deleteStudent('${student.id}')"><i class="fas fa-trash"></i> <span data-i18n="delete">Delete</span></button>
@@ -767,7 +824,7 @@ const displayLibrarians = (librarians) => {
     tr.innerHTML = `
       <td>${librarian.firstName} ${librarian.familyName}</td>
       <td>${librarian.email}</td>
-      <td><span class="badge badge-${librarian.status === 'ACTIVE' ? 'success' : 'danger'}">${librarian.status}</span></td>
+      <td><span class="badge badge-${librarian.isVerified  ? 'success' : 'danger'}">${librarian.isVerified ? "Active" : "Inactive"}</span></td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="controlDashboard.editLibrarian('${librarian.id}')"><i class="fas fa-edit"></i> <span data-i18n="edit">Edit</span></button>
         <button class="btn btn-sm btn-outline-danger me-1" onclick="controlDashboard.deleteLibrarian('${librarian.id}')"><i class="fas fa-trash"></i> <span data-i18n="delete">Delete</span></button>
@@ -783,7 +840,8 @@ const loadReservations = async () => {
   try {
     const response = await getAllReservations();
     if (!response.ok) throw new Error('Failed to fetch reservations');
-    const { data } = await response.json();
+    const { data } =  response;
+    console.log(data)
     displayReservations(data);
   } catch (error) {
     console.error('Error loading reservations:', error);
@@ -798,9 +856,9 @@ const displayReservations = (reservations) => {
   reservations.forEach(reservation => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${reservation.student?.firstName} ${reservation.student?.familyName}</td>
+      <td>${reservation.user?.firstName} ${reservation.user?.familyName}</td>
       <td>${reservation.book?.title}</td>
-      <td>${new Date(reservation.requestDate).toLocaleDateString()}</td>
+      <td>${reservation.createdAt.split('T')[0]}</td>
       <td><span class="badge badge-${reservation.status === 'PENDING' ? 'warning' : reservation.status === 'APPROVED' ? 'success' : 'danger'}">${reservation.status}</span></td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="controlDashboard.approveReservation('${reservation.id}')"><i class="fas fa-check"></i> <span data-i18n="approve">Approve</span></button>
@@ -847,9 +905,10 @@ const loadFines = async (filter = 'all') => {
   try {
     const response = await getAllFines();
     if (!response.ok) throw new Error('Failed to fetch fines');
-    let { data } = await response.json();
-    if (filter === 'paid') data = data.filter(fine => fine.status === 'PAID');
-    if (filter === 'unpaid') data = data.filter(fine => fine.status === 'UNPAID');
+    let { data } = response;
+    console.log(data)
+    if (filter === 'paid') data = data.filter(fine => fine.paid === true);
+    if (filter === 'unpaid') data = data.filter(fine => fine.paid === false);
     displayFines(data);
   } catch (error) {
     console.error('Error loading fines:', error);
@@ -864,10 +923,10 @@ const displayFines = (fines) => {
   fines.forEach(fine => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${fine.student?.firstName} ${fine.student?.familyName}</td>
-      <td>${fine.book?.title}</td>
+      <td>${fine.user?.firstName} ${fine.user?.familyName}</td>
+      <td>${fine.reservation.book.title}</td>
       <td>${fine.amount}</td>
-      <td><span class="badge badge-${fine.status === 'PAID' ? 'success' : 'danger'}">${i18next.t(fine.status.toLowerCase())}</span></td>
+      <td><span class="badge badge-${fine.paid ? 'success' : 'danger'}">${i18next.t(fine.paid ? "paid" : "unpaid")}</span></td>
       <td>${new Date(fine.createdAt).toLocaleDateString()}</td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="controlDashboard.markFinePaid('${fine.id}')"><i class="fas fa-check"></i> <span data-i18n="markPaid">Mark Paid</span></button>

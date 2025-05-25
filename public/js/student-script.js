@@ -172,7 +172,7 @@ async function checkAuth() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/user/`, {
+    const response = await fetch(`${API_URL}/users/`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Unauthorized');
@@ -241,8 +241,8 @@ async function initHome() {
 async function loadHomeData() {
   try {
     const [reservationsResponse, finesResponse] = await Promise.all([
-      fetch(`${API_URL}/reservation/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }),
-      fetch(`${API_URL}/fine/user`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+      fetch(`${API_URL}/reservations/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }),
+      fetch(`${API_URL}/fines/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
     ]);
 
     if (!reservationsResponse.ok || !finesResponse.ok) throw new Error('Failed to load data');
@@ -272,7 +272,7 @@ async function displayRecentReservations(reservations) {
 
   for (const res of reservations) {
     try {
-      const bookResponse = await fetch(`${API_URL}/book/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const bookResponse = await fetch(`${API_URL}/books/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: book } = await bookResponse.json();
       const li = document.createElement('li');
       li.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -294,9 +294,9 @@ async function displayRecentFines(fines) {
 
   for (const fine of fines) {
     try {
-      const resResponse = await fetch(`${API_URL}/reservation/${fine.reservationId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const resResponse = await fetch(`${API_URL}/reservations/${fine.reservationId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: res } = await resResponse.json();
-      const bookResponse = await fetch(`${API_URL}/book/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const bookResponse = await fetch(`${API_URL}/books/${res.bookId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       const { data: book } = await bookResponse.json();
       const li = document.createElement('li');
       li.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -325,7 +325,7 @@ async function initBrowseBooks() {
 
 async function loadBooks(query = '') {
   try {
-    const response = await fetch(`${API_URL}/book/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/books/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch books');
     const { data } = await response.json();
     const filteredBooks = query ? data.filter(book =>
@@ -371,7 +371,7 @@ async function initStudentBooks() {
 
 async function setupFilters() {
   try {
-    const response = await fetch(`${API_URL}/book/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/books/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch books');
     const { data } = await response.json();
 
@@ -416,7 +416,7 @@ function applyFilters() {
 
 async function loadBooks(query = '', filters = {}) {
   try {
-    const response = await fetch(`${API_URL}/book/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    const response = await fetch(`${API_URL}/books/all`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     if (!response.ok) throw new Error('Failed to fetch books');
     const { data } = await response.json();
     const filteredBooks = filterBooks(data, query, filters);
@@ -458,7 +458,7 @@ document.addEventListener('submit', (e) => {
     const startDate = document.getElementById('startDate').value;
     const returnDate = document.getElementById('returnDate').value;
 
-    fetch(`${API_URL}/reservation/`, {
+    fetch(`${API_URL}/reservations/`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,

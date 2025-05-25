@@ -65,7 +65,7 @@ async function checkAuth() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/user/`, {
+    const response = await fetch(`${API_URL}/users/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Unauthorized');
@@ -97,7 +97,7 @@ function setupSidebarToggle() {
 // Load fines
 async function loadFines() {
   try {
-    const response = await fetch(`${API_URL}/fine/all`, {
+    const response = await fetch(`${API_URL}/fines/all`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     if (!response.ok) throw new Error('Failed to fetch fines');
@@ -123,10 +123,10 @@ async function enrichFinesData(fines) {
   const enriched = [];
   for (const fine of fines) {
     try {
-      const userResponse = await fetch(`${API_URL}/user/${fine.userId}`, {
+      const userResponse = await fetch(`${API_URL}/users/${fine.userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      const reservationResponse = await fetch(`${API_URL}/reservation/${fine.reservationId}`, {
+      const reservationResponse = await fetch(`${API_URL}/reservations/${fine.reservationId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
@@ -134,7 +134,7 @@ async function enrichFinesData(fines) {
 
       const { data: user } = await userResponse.json();
       const { data: reservation } = await reservationResponse.json();
-      const bookResponse = await fetch(`${API_URL}/book/${reservation.bookId}`, {
+      const bookResponse = await fetch(`${API_URL}/books/${reservation.bookId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const { data: book } = await bookResponse.json();

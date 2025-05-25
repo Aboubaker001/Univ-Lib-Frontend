@@ -95,7 +95,7 @@ async function checkAuth() {
 // Load reservations
 async function loadReservations() {
   try {
-    const response = await fetch(`${API_URL}/reservations/user`, {
+    const response = await fetch(`${API_URL}/reservations/all`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     if (!response.ok) throw new Error('Failed to fetch reservations');
@@ -114,7 +114,7 @@ async function displayReservations(reservations) {
 
   for (const res of reservations) {
     try {
-      const bookResponse = await fetch(`${API_URL}/boosk/${res.bookId}`, {
+      const bookResponse = await fetch(`${API_URL}/books/${res.bookId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const { data: book } = await bookResponse.json();

@@ -154,10 +154,11 @@ const api = {
       if (!['ADMIN', 'LIBRARIAN', 'STUDENT'].includes(data.role)) {
         throw new Error(translations[i18next.language].invalidData);
       }
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.data);//data.token
       localStorage.setItem('userRole', data.role);
       return { ok: true, role: data.role };
     } catch (error) {
+      console.log(error)
       return { ok: false, message: error.message };
     }
   },
@@ -174,6 +175,7 @@ const api = {
       }
       return { ok: true };
     } catch (error) {
+      console.log(error)
       return { ok: false, message: error.message };
     }
   }
@@ -211,7 +213,7 @@ const checkLoginAttempts = () => {
 
 const updateLoginAttempts = (reset = false) => {
   if (reset) {
-    localStorage.removeItem('loginAttempts');
+    //localStorage.removeItem('loginAttempts');
     return;
   }
   const attempts = JSON.parse(localStorage.getItem('loginAttempts') || '{}');

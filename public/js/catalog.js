@@ -2,9 +2,9 @@
 import { API_URL } from './config.js';
 
 export async function fetchWithAuth(url, options = {}) {
-  const fullUrl = `${API_URL}${url}`;
-  const headers = { ...options.headers, 'Content-Type': 'application/json' };
-  return fetch(fullUrl, { ...options, headers, credentials: 'include' });
+    const fullUrl = `${API_URL}${url}`;
+    const headers = { ...options.headers, 'Content-Type': 'application/json' };
+    return fetch(fullUrl, { ...options, headers, credentials: 'include' });
 }
 
 
@@ -129,37 +129,155 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Perform catalog search
-    // function performCatalogSearch(query, filters) {
-    //     if (!query && filters.category === 'all' && filters.format === 'all' && filters.availability === 'all') return;
-    //     const searchForm = document.getElementById('catalogSearchForm');
-    //     if (searchForm) searchForm.classList.add('search-loading');
-    //     addToRecentSearches(query);
-    //     // TODO: Replace with actual API call
-    //     // Example: fetch(`${API_BASE_URL}/catalog/search?q=${encodeURIComponent(query)}&category=${filters.category}&format=${filters.format}&availability=${filters.availability}`)
-    //     setTimeout(() => {
-    //         const mockResults = [
-    //             {
-    //                 id: '1',
-    //                 category: 'science',
-    //                 title: 'Introduction to Quantum Computing',
-    //                 author: 'Dr. Jane Smith',
-    //                 status: 'available',
-    //                 image: 'https://images.unsplash.com/photo-1589994965851-a8f43a9d939c'
-    //             },
-    //             {
-    //                 id: '2',
-    //                 category: 'history',
-    //                 title: 'Modern Historical Studies',
-    //                 author: 'Edited by Prof. John Doe',
-    //                 status: 'checked-out',
-    //                 image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73'
-    //             }
-    //         ];
-    //         displayCatalogResults(mockResults);
-    //         if (searchForm) searchForm.classList.remove('search-loading');
-    //         clearSearchSuggestions();
-    //     }, 600);
-    // }
+    function performCatalogSearch(query, filters) {
+        if (!query && filters.category === 'all' && filters.format === 'all' && filters.availability === 'all') return;
+
+        const searchForm = document.getElementById('catalogSearchForm');
+        if (searchForm) searchForm.classList.add('search-loading');
+
+        addToRecentSearches(query);
+
+        setTimeout(() => {
+            const mockResults = [
+                {
+                    id: 'book1',
+                    isbn: '9780131103627',
+                    title: 'The C Programming Language',
+                    edition: '2nd Edition',
+                    publisher: 'Prentice Hall',
+                    publicationYear: 1988,
+                    pageCount: 272,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780131103627-L.jpg',
+                    authors: ['Brian W. Kernighan', 'Dennis M. Ritchie'],
+                    status: 'AVAILABLE'
+                },
+                {
+                    id: 'book2',
+                    isbn: '9780262033848',
+                    title: 'Introduction to Algorithms',
+                    edition: '3rd Edition',
+                    publisher: 'MIT Press',
+                    publicationYear: 2009,
+                    pageCount: 1312,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780262033848-L.jpg',
+                    authors: ['Thomas H. Cormen', 'Charles E. Leiserson', 'Ronald L. Rivest', 'Clifford Stein'],
+                    status: 'CHECKED_OUT'
+                },
+                {
+                    id: 'book3',
+                    isbn: '9780201633610',
+                    title: 'Design Patterns: Elements of Reusable Object-Oriented Software',
+                    edition: '1st Edition',
+                    publisher: 'Addison-Wesley',
+                    publicationYear: 1994,
+                    pageCount: 395,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780201633610-L.jpg',
+                    authors: ['Erich Gamma', 'Richard Helm', 'Ralph Johnson', 'John Vlissides'],
+                    status: 'AVAILABLE'
+                },
+                {
+                    id: 'book4',
+                    isbn: '9780596007126',
+                    title: 'Head First Design Patterns',
+                    edition: '1st Edition',
+                    publisher: 'O\'Reilly Media',
+                    publicationYear: 2004,
+                    pageCount: 694,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780596007126-L.jpg',
+                    authors: ['Eric Freeman', 'Elisabeth Robson'],
+                    status: 'RESERVED'
+                },
+                {
+                    id: 'book5',
+                    isbn: '9780321127426',
+                    title: 'Refactoring: Improving the Design of Existing Code',
+                    edition: '1st Edition',
+                    publisher: 'Addison-Wesley',
+                    publicationYear: 1999,
+                    pageCount: 464,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780321127426-L.jpg',
+                    authors: ['Martin Fowler', 'Kent Beck'],
+                    status: 'AVAILABLE'
+                },
+                {
+                    id: 'book6',
+                    isbn: '9780132350884',
+                    title: 'Clean Code: A Handbook of Agile Software Craftsmanship',
+                    edition: '1st Edition',
+                    publisher: 'Prentice Hall',
+                    publicationYear: 2008,
+                    pageCount: 464,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg',
+                    authors: ['Robert C. Martin'],
+                    status: 'CHECKED_OUT'
+                },
+                {
+                    id: 'book7',
+                    isbn: '9780201485677',
+                    title: 'The Pragmatic Programmer: From Journeyman to Master',
+                    edition: '1st Edition',
+                    publisher: 'Addison-Wesley',
+                    publicationYear: 1999,
+                    pageCount: 352,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780201485677-L.jpg',
+                    authors: ['Andrew Hunt', 'David Thomas'],
+                    status: 'AVAILABLE'
+                },
+                {
+                    id: 'book8',
+                    isbn: '9780137081073',
+                    title: 'The Art of Computer Programming, Volume 1: Fundamental Algorithms',
+                    edition: '3rd Edition',
+                    publisher: 'Addison-Wesley',
+                    publicationYear: 1997,
+                    pageCount: 672,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780137081073-L.jpg',
+                    authors: ['Donald E. Knuth'],
+                    status: 'RESERVED'
+                },
+                {
+                    id: 'book9',
+                    isbn: '9780596517748',
+                    title: 'JavaScript: The Good Parts',
+                    edition: '1st Edition',
+                    publisher: 'O\'Reilly Media',
+                    publicationYear: 2008,
+                    pageCount: 176,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780596517748-L.jpg',
+                    authors: ['Douglas Crockford'],
+                    status: 'AVAILABLE'
+                },
+                {
+                    id: 'book10',
+                    isbn: '9780321714114',
+                    title: 'Effective Java',
+                    edition: '2nd Edition',
+                    publisher: 'Addison-Wesley',
+                    publicationYear: 2008,
+                    pageCount: 368,
+                    language: 'English',
+                    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780321714114-L.jpg',
+                    authors: ['Joshua Bloch'],
+                    status: 'CHECKED_OUT'
+                }
+            ];
+
+            // You can filter mockResults here based on `query` or `filters`
+            displayCatalogResults(mockResults);
+            if (searchForm) searchForm.classList.remove('search-loading');
+            clearSearchSuggestions();
+        }, 600);
+    }
+
 
     // Fetch search suggestions (mock)
     function fetchSearchSuggestions(query) {
