@@ -1,8 +1,7 @@
-import { fetchWithAuth } from './api.js';
-
-// Constants
+// Base API URL for all API calls (change to production URL as needed, e.g., 'https://your-domain.com/api')
 const API_BASE_URL = 'https://univ-lib-backend.onrender.com/api';
-const RECENT_SEARCHES_KEY = 'libraryRecentSearches';
+
+// Translation data
 const translations = {
   en: {
     home: {
@@ -502,40 +501,7 @@ const translations = {
   }
 };
 
-// State Management
-const authState = {
-  isLoggedIn: !!localStorage.getItem('token'),
-  isAdmin: localStorage.getItem('userRole') === 'admin',
-  isLibrarian: localStorage.getItem('userRole') === 'librarian',
-  isStudent: localStorage.getItem('userRole') === 'student',
-  isAuthenticated: function() {
-    return this.isLoggedIn && (this.isAdmin || this.isLibrarian || this.isStudent);
-  }
-};
-
-// Utility Functions
-const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-};
-
-const showToast = (message, type = 'info') => {
-  const toast = document.createElement('div');
-  toast.className = `toast alert-${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  console.log(`Toast displayed: ${message} (${type})`);
-
-  setTimeout(() => {
-    toast.classList.add('fade-out');
-    setTimeout(() => toast.remove(), 300);
-  }, 2700);
-};
-
-// Core Functions
+// Initialize language functionality
 function initializeLanguage() {
   const savedLanguage = localStorage.getItem('language') || 'en';
   console.log(`Initializing language: ${savedLanguage}`);
@@ -551,6 +517,7 @@ function initializeLanguage() {
   window.dispatchEvent(new Event('resize'));
 }
 
+// Apply translations to the page
 function applyLanguage(lang) {
   console.log(`Applying language: ${lang}`);
   const page = window.location.pathname.includes('about-us.html') ? 'about' : 'home';
@@ -584,6 +551,7 @@ function applyLanguage(lang) {
   }
 }
 
+// Setup language selector dropdown
 function setupLanguageSelector() {
   const languageItems = document.querySelectorAll('.language-selector .dropdown-item');
   if (!languageItems.length) {
@@ -610,807 +578,298 @@ function setupLanguageSelector() {
         languageText.textContent = selectedLang === 'ar' ? 'AR' : 'EN';
       }
       languageItems.forEach(i => i.setAttribute('aria-selected', i.getAttribute('data-lang') === selectedLang));
-      // Refresh dynamic content
-      setupBookCarousel();
-      setupFeaturedCollections();
-      setupQuickAccess();
     });
   });
 }
 
-// Search Functionality
-function setupSearchFunctionality() {
+// Setup search bar functionality
+async function setupSearchBar() {
   const searchForm = document.getElementById('searchForm');
-  const searchInput = document.getElementById('searchQuery');
+  const searchQueryInput = document.getElementById('searchQuery');
   const searchSuggestions = document.querySelector('.search-suggestions');
-  if (!searchForm || !searchInput || !searchSuggestions) {
-    console.warn('Search elements missing:', { searchForm, searchInput, searchSuggestions });
+
+  if (!searchForm || !searchQueryInput || !searchSuggestions) {
+    console.warn('Search bar elements not found');
     return;
   }
 
-  searchForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const query = searchInput.value.trim();
-    if (query) {
-      console.log(`Submitting search: ${query}`);
-      await performSearch(query);
-    }
-  });
+  console.log('Setting up search bar functionality');
 
-  searchInput.addEventListener('input', debounce(async () => {
-    const query = searchInput.value.trim();
-    if (query.length > 2) {
-      console.log(`Fetching suggestions for: ${query}`);
-      await fetchSearchSuggestions(query);
-    } else {
-      clearSearchSuggestions();
-    }
-  }, 300));
+  // Enhance accessibility
+  searchQueryInput.setAttribute('aria-autocomplete', 'list');
+  searchQueryInput.setAttribute('aria-controls', 'search-suggestions');
+  searchSuggestions.setAttribute('role', 'listbox');
 
-  searchInput.addEventListener('focus', () => {
-    const query = searchInput.value.trim();
-    if (query.length > 2) {
-      fetchSearchSuggestions(query);
-    } else {
-      showRecentSearches();
-    }
-  });
+  // Debounce function to limit API calls
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
-  searchInput.addEventListener('keydown', (e) => {
-    const suggestions = searchSuggestions.querySelectorAll('.search-suggestion-item');
-    if (!suggestions.length) return;
-
-    const currentIndex = Array.from(suggestions).findIndex(s => s.classList.contains('selected'));
-    let newIndex = currentIndex;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      newIndex = currentIndex + 1 < suggestions.length ? currentIndex + 1 : 0;
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      newIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : suggestions.length - 1;
-    } else if (e.key === 'Enter' && currentIndex >= 0) {
-      e.preventDefault();
-      const selectedQuery = suggestions[currentIndex].getAttribute('data-query');
-      searchInput.value = selectedQuery;
-      performSearch(selectedQuery);
-      return;
-    } else {
+  // Fetch search suggestions with authentication and timeout
+  async function fetchSuggestions(query) {
+    if (query.length < 2) {
+      searchSuggestions.innerHTML = '';
+      searchSuggestions.style.display = 'none';
       return;
     }
 
-    suggestions.forEach(s => s.classList.remove('selected'));
-    suggestions[newIndex].classList.add('selected');
-    suggestions[newIndex].scrollIntoView({ block: 'nearest' });
-  });
+    // Sanitize query to prevent injection
+    const sanitizedQuery = query.replace(/[<>"'&]/g, '');
 
-  searchSuggestions.addEventListener('click', (e) => {
-    const suggestion = e.target.closest('.search-suggestion-item');
-    if (suggestion) {
-      const query = suggestion.getAttribute('data-query');
-      searchInput.value = query;
-      console.log(`Suggestion clicked: ${query}`);
-      performSearch(query);
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!searchForm.contains(e.target)) {
-      clearSearchSuggestions();
-    }
-  });
-}
-
-async function performSearch(query) {
-  if (!query) return;
-  addToRecentSearches(query);
-  const searchForm = document.getElementById('searchForm');
-  if (searchForm) searchForm.classList.add('search-loading');
-
-  try {
-    const { ok, data } = await fetchWithAuth(`/books/search?q=${encodeURIComponent(query)}`);
-    if (ok) {
-      console.log(`Search successful, redirecting to catalog with query: ${query}`);
-      window.location.href = `/main/catalog.html?q=${encodeURIComponent(query)}`;
-    } else {
-      showToast(data.message || 'Search failed.', 'error');
-    }
-  } catch (error) {
-    console.error('Search error:', error);
-    showToast(error.message || 'An error occurred during search.', 'error');
-  } finally {
-    if (searchForm) searchForm.classList.remove('search-loading');
-    clearSearchSuggestions();
-  }
-}
-
-async function fetchSearchSuggestions(query) {
-  try {
-    const { ok, data } = await fetchWithAuth(`/books/search?q=${encodeURIComponent(query)}`);
-    if (ok && data.books) {
-      displaySearchSuggestions(data.books);
-    } else {
-      clearSearchSuggestions();
-    }
-  } catch (error) {
-    console.error('Suggestions error:', error);
-    clearSearchSuggestions();
-  }
-}
-
-function displaySearchSuggestions(suggestions) {
-  const searchSuggestions = document.querySelector('.search-suggestions');
-  if (!searchSuggestions) return;
-
-  searchSuggestions.innerHTML = suggestions.length === 0
-    ? '<div class="searchрдс-suggestion-item text-muted p-3" role="option">No suggestions found</div>'
-    : suggestions.map((item, index) => `
-        <div class="search-suggestion-item" data-query="${item.title}" role="option" id="suggestion-${index}" tabindex="0">
-          <i class="fas fa-book me-2 text-primary"></i>
-          ${item.title}
-        </div>
-      `).join('');
-
-  searchSuggestions.classList.add('show');
-}
-
-function showRecentSearches() {
-  const searchSuggestions = document.querySelector('.search-suggestions');
-  if (!searchSuggestions) return;
-
-  const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
-  if (recentSearches.length === 0) return;
-
-  searchSuggestions.innerHTML = `
-    <div class="p-2 text-muted" role="option">Recent searches</div>
-    ${recentSearches.map((item, index) => `
-        <div class="search-suggestion-item" data-query="${item}" role="option" id="recent-${index}" tabindex="0">
-          <i class="fas fa-history me-2"></i>
-          ${item}
-        </div>
-      `).join('')}
-  `;
-
-  searchSuggestions.classList.add('show');
-}
-
-function addToRecentSearches(query) {
-  const recentSearches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY)) || [];
-  if (!recentSearches.includes(query)) {
-    recentSearches.unshift(query);
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recentSearches.slice(0, 5)));
-  }
-}
-
-function clearSearchSuggestions() {
-  const searchSuggestions = document.querySelector('.search-suggestions');
-  if (searchSuggestions) {
-    searchSuggestions.innerHTML = '';
-    searchSuggestions.classList.remove('show');
-  }
-}
-
-// UI Effects
-function setupHeaderScrollEffects() {
-  const header = document.querySelector('.navbar');
-  if (!header) {
-    console.warn('Navbar element (.navbar) not found');
-    return;
-  }
-
-  const handleScroll = debounce(() => {
-    header.classList.toggle('scrolled', window.scrollY > 80);
-  }, 10);
-
-  window.addEventListener('scroll', handleScroll);
-}
-
-function setupSmoothScrolling() {
-  document.addEventListener('click', (e) => {
-    const anchor = e.target.closest('a[href^="#"], .hero-scroll-indicator');
-    if (!anchor) return;
-
-    e.preventDefault();
-    const targetId = anchor.getAttribute('href')?.substring(1) || 'features';
-    if (targetId === '#') return;
-
-    const targetElement = document.getElementById(targetId);
-    if (targetElement) {
-      const headerHeight = document.querySelector('.fixed-header')?.offsetHeight || 0;
-      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
-
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      });
-    } else {
-      console.warn(`Scroll target #${targetId} not found`);
-    }
-  });
-}
-
-function setupBackToTopButton() {
-  const backToTopBtn = document.getElementById('back-to-top');
-  if (!backToTopBtn) {
-    console.warn('Back to top button (#back-to-top) not found');
-    return;
-  }
-
-  const handleScroll = debounce(() => {
-    backToTopBtn.classList.toggle('active', window.scrollY > 300);
-  }, 10);
-
-  window.addEventListener('scroll', handleScroll);
-  backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
-
-function setupCardHoverEffects() {
-  document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('.card, .carousel-book-card, .collection-card');
-    if (!card) return;
-
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-  });
-
-  document.addEventListener('mouseleave', (e) => {
-    const card = e.target.closest('.card, .carousel-book-card, .collection-card');
-    if (!card) return;
-
-    card.style.removeProperty('--mouse-x');
-    card.style.removeProperty('--mouse-y');
-  });
-}
-
-// Authentication
-function setupAuthUI() {
-  const authButton = document.getElementById('authButton');
-  const dashboardButton = document.getElementById('dashboardButton');
-  if (!authButton || !dashboardButton) {
-    console.warn('Auth elements missing:', { authButton, dashboardButton });
-    return;
-  }
-
-  function updateAuthUI() {
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
-    const lang = localStorage.getItem('language') || 'en';
-
-    if (token) {
-      authButton.setAttribute('data-i18n', 'nav.logout');
-      authButton.textContent = translations[lang].nav.logout;
-      authButton.onclick = handleLogout;
-      dashboardButton.style.display = 'inline-block';
-      dashboardButton.href = userRole === 'student' ? '/student/home.html' : '/admin-librarian/dashboard.html';
-    } else {
-      authButton.setAttribute('data-i18n', 'nav.login');
-      authButton.textContent = translations[lang].nav.login;
-      authButton.onclick = handleLogin;
-      dashboardButton.style.display = 'none';
-    }
-
-    applyLanguage(lang);
-  }
-
-  authButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    authButton.onclick();
-  });
-
-  updateAuthUI();
-
-  function handleLogin() {
-    console.log('Redirecting to login page');
-    window.location.href = './login.html';
-  }
-
-  async function handleLogout() {
     try {
-      const { ok, data } = await fetchWithAuth('/users/logout', {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 10s timeout
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/books/search?q=${encodeURIComponent(sanitizedQuery)}`, {
         method: 'GET',
-        credentials: 'include'
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+        signal: controller.signal,
       });
 
-      if (ok && data.message === 'Logged out successfully') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        showToast('Logged out successfully!', 'success');
-        updateAuthUI();
-        window.location.href = '/main/home.html';
-      } else {
-        showToast(data.message || 'Logout failed.', 'error');
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      showToast(error.message || 'An error occurred during logout.', 'error');
-    }
-  }
-}
+      clearTimeout(timeoutId);
 
-// Forms
-function setupNewsletterForm() {
-  const newsletterForm = document.getElementById('newsletterForm');
-  if (!newsletterForm) {
-    console.warn('Newsletter form (#newsletterForm) not found');
-    return;
-  }
-
-  newsletterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = newsletterForm.querySelector('input[type="email"]').value.trim();
-    if (!email) return;
-
-    try {
-      const { ok, data } = await fetchWithAuth('/newsletter', {
-        method: 'POST',
-        body: JSON.stringify({ email })
-      });
-
-      if (ok) {
-        showToast(translations[localStorage.getItem('language') || 'en'].footer.newsletter.success, 'success');
-        newsletterForm.reset();
-      } else {
-        showToast(data.message || 'Subscription failed.', 'error');
-      }
-    } catch (error) {
-      console.error('Newsletter error:', error);
-      showToast(error.message || 'Subscription failed. Try again.', 'error');
-    }
-  });
-}
-
-function setupContactForm() {
-  const contactForm = document.getElementById('contactForm');
-  if (!contactForm) {
-    console.warn('Contact form (#contactForm) not found');
-    return;
-  }
-
-  contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('contactName')?.value;
-    const email = document.getElementById('contactEmail')?.value;
-    const message = document.getElementById('contactMessage')?.value;
-
-    if (!name || !email || !message) {
-      showToast('Please fill all contact form fields.', 'error');
-      return;
-    }
-
-    try {
-      const { ok, data } = await fetchWithAuth('/contact', {
-        method: 'POST',
-        body: JSON.stringify({ name, email, message })
-      });
-
-      if (ok) {
-        showToast(translations[localStorage.getItem('language') || 'en'].about.contact.form.success, 'success');
-        contactForm.reset();
-      } else {
-        showToast(data.message || 'Failed to send message.', 'error');
-      }
-    } catch (error) {
-      console.error('Contact form error:', error);
-      showToast(error.message || 'An error occurred. Please try again.', 'error');
-    }
-  });
-}
-
-// Animations and Media
-function setupIntroSection() {
-  if (!window.location.pathname.includes('index.html')) return;
-
-  const introVideo = document.querySelector('.intro-video');
-  if (!introVideo || introVideo.tagName !== 'VIDEO') {
-    console.warn('Intro video (.intro-video) not found or not a video element');
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          introVideo.play();
-        } else {
-          introVideo.pause();
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          searchSuggestions.innerHTML = '<div class="suggestion-item text-warning" role="option">Please log in to search</div>';
+          searchSuggestions.style.display = 'block';
+          return;
         }
-      });
-    },
-    { threshold: 0.3 }
-  );
-
-  observer.observe(introVideo);
-}
-
-function initAnimations() {
-  if (typeof AOS !== 'undefined') {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-out-quart',
-      once: true,
-      offset: 100
-    });
-    console.log('AOS initialized');
-  } else {
-    console.warn('AOS library not loaded');
-  }
-
-  document.addEventListener('click', (e) => {
-    const button = e.target.closest('.btn');
-    if (!button) return;
-
-    const rect = button.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple-effect');
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-    button.appendChild(ripple);
-
-    setTimeout(() => ripple.remove(), 500);
-  });
-}
-
-// Data Fetching and Rendering
-function setupBookCarousel() {
-  const carouselInner = document.querySelector('#bookCarousel .carousel-inner');
-  const carouselIndicators = document.querySelector('#bookCarousel .carousel-indicators');
-  if (!carouselInner || !carouselIndicators) {
-    console.warn('Book carousel elements missing:', { carouselInner, carouselIndicators });
-    return;
-  }
-
-  async function fetchLatestBooks() {
-    carouselInner.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-    try {
-      console.log('Fetching latest books from /books/latest?limit=10');
-      const { ok, data } = await fetchWithAuth('/books/latest?limit=10');
-      if (ok && Array.isArray(data)) {
-        console.log(`Fetched ${data.length} books`);
-        populateCarousel(data);
-      } else {
-        throw new Error(data.message || 'Failed to fetch books');
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
+
+      const { data: books } = await response.json();
+      displaySuggestions(books);
     } catch (error) {
-      console.error('Error fetching books:', error);
-      showToast(error.message || 'Failed to load new arrivals.', 'error');
-      populateCarousel(getMockBooks());
+      console.error('Error fetching suggestions:', error);
+      const errorMessage = error.name === 'AbortError' ? 'Search request timed out' : error.message || 'Error loading suggestions';
+      searchSuggestions.innerHTML = `<div class="suggestion-item text-danger" role="option">${errorMessage}</div>`;
+      searchSuggestions.style.display = 'block';
     }
   }
 
-  function getMockBooks() {
-    const lang = localStorage.getItem('language') || 'en';
-    console.log('Using mock books for language:', lang);
-    return [
-      {
-        id: '1',
-        title: translations[lang].newArrivals.quantum.title,
-        authors: ['Dr. Jane Smith'],
-        isbn: '978-3-16-148410-0',
-        status: 'AVAILABLE',
-        imageUrl: 'https://via.placeholder.com/150?text=Quantum+Computing'
-      },
-      {
-        id: '2',
-        title: translations[lang].newArrivals.history.title,
-        authors: ['Prof. John Doe'],
-        isbn: '978-1-234-56789-0',
-        status: 'CHECKED_OUT',
-        imageUrl: 'https://via.placeholder.com/150?text=Historical+Studies'
-      },
-      {
-        id: '3',
-        title: translations[lang].newArrivals.architecture.title,
-        authors: ['Architect Lisa Brown'],
-        isbn: '978-0-123-45678-9',
-        status: 'AVAILABLE',
-        imageUrl: 'https://via.placeholder.com/150?text=Sustainable+Architecture'
-      }
-    ];
-  }
-
-  function populateCarousel(books) {
-    carouselInner.innerHTML = '';
-    carouselIndicators.innerHTML = '';
-
-    if (books.length === 0) {
-      carouselInner.innerHTML = `
-        <div class="carousel-item active">
-          <p class="text-center text-muted py-5">No new arrivals available.</p>
-        </div>
-      `;
-      console.log('No books to display');
+  // Display search suggestions with accessibility
+  function displaySuggestions(books) {
+    searchSuggestions.innerHTML = '';
+    if (!books || books.length === 0) {
+      searchSuggestions.innerHTML = '<div class="suggestion-item" role="option">No results found</div>';
+      searchSuggestions.style.display = 'block';
       return;
     }
 
     books.forEach((book, index) => {
-      const isActive = index === 0 ? 'active' : '';
-
-      const carouselItem = document.createElement('div');
-      carouselItem.className = `carousel-item ${isActive}`;
-      carouselItem.innerHTML = `
-        <div class="carousel-book-card mx-auto" style="max-width: 300px;">
-          <div class="carousel-book-img">
-            <img src="${book.imageUrl || 'https://via.placeholder.com/150'}" alt="${book.title}" loading="lazy">
-          </div>
-          <div class="carousel-book-status status-${book.status.toLowerCase().replace('_', '-')}" data-i18n="catalog.status">
-            ${book.status.replace('_', ' ')}
-          </div>
-          <div class="carousel-book-body">
-            <h3 class="carousel-book-title">${book.title}</h3>
-            <p class="carousel-book-text" data-i18n="catalog.authors">${translations[localStorage.getItem('language') || 'en'].catalog.authors}: ${book.authors.join(', ')}</p>
-            <p class="carousel-book-text" data-i18n="catalog.isbn">${translations[localStorage.getItem('language') || 'en'].catalog.isbn}: ${book.isbn}</p>
-            <a href="catalog.html?bookId=${book.id}" class="btn btn-details btn-glow" data-i18n="catalog.viewDetails">${translations[localStorage.getItem('language') || 'en'].catalog.viewDetails}</a>
-          </div>
-        </div>
+      const suggestion = document.createElement('div');
+      suggestion.className = 'suggestion-item';
+      suggestion.setAttribute('role', 'option');
+      suggestion.setAttribute('id', `suggestion-${index}`);
+      suggestion.setAttribute('tabindex', '0');
+      suggestion.innerHTML = `
+        <strong>${book.title}</strong> by ${book.authors.join(', ')}<br>
+        <small>Language: ${book.language} | Status: ${book.status}</small>
       `;
-      carouselInner.appendChild(carouselItem);
-
-      const indicator = document.createElement('button');
-      indicator.type = 'button';
-      indicator.setAttribute('data-bs-target', '#bookCarousel');
-      indicator.setAttribute('data-bs-slide-to', index);
-      if (isActive) indicator.className = 'active';
-      indicator.setAttribute('aria-label', `Slide ${index + 1}`);
-      if (isActive) indicator.setAttribute('aria-current', 'true');
-      carouselIndicators.appendChild(indicator);
+      suggestion.addEventListener('click', () => {
+        window.location.href = `/public/main/public-book-details.html?id=${book.id}`;
+      });
+      suggestion.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'Space') {
+          e.preventDefault();
+          window.location.href = `/public/main/public-book-details.html?id=${book.id}`;
+        }
+      });
+      searchSuggestions.appendChild(suggestion);
     });
-
-    console.log(`Populated carousel with ${books.length} books`);
-    applyLanguage(localStorage.getItem('language') || 'en');
+    searchSuggestions.style.display = 'block';
   }
 
-  fetchLatestBooks();
-}
+  // Handle form submission
+  searchForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = searchQueryInput.value.trim();
+    if (query.length < 2) {
+      searchSuggestions.innerHTML = '<div class="suggestion-item text-warning" role="option">Please enter at least 2 characters</div>';
+      searchSuggestions.style.display = 'block';
+      return;
+    }
 
-function setupFeaturedCollections() {
-  const collectionsContainer = document.querySelector('.featured-collections .glide__slides');
-  if (!collectionsContainer) {
-    console.warn('Featured collections container (.featured-collections .glide__slides) not found');
-    return;
-  }
+    // Sanitize query
+    const sanitizedQuery = query.replace(/[<>"'&]/g, '');
 
-  async function fetchFeaturedCollections() {
     try {
-      console.log('Fetching featured collections from /collections/featured');
-      const { ok, data } = await fetchWithAuth('/collections/featured');
-      if (ok && Array.isArray(data)) {
-        console.log(`Fetched ${data.length} collections`);
-        populateCollections(data);
-      } else {
-        throw new Error(data.message || 'Failed to fetch collections');
-      }
-    } catch (error) {
-      console.error('Error fetching collections:', error);
-      showToast(error.message || 'Failed to load featured collections.', 'error');
-      populateCollections(getMockCollections());
-    }
-  }
-
-  function getMockCollections() {
-    const lang = localStorage.getItem('language') || 'en';
-    console.log('Using mock collections for language:', lang);
-    return [
-      {
-        id: 'science',
-        title: translations[lang].collections.science.title,
-        description: translations[lang].collections.science.description,
-        imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31'
-      },
-      {
-        id: 'history',
-        title: translations[lang].collections.history.title,
-        description: translations[lang].collections.history.description,
-        imageUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da'
-      },
-      {
-        id: 'art',
-        title: translations[lang].collections.art.title,
-        description: translations[lang].collections.art.description,
-        imageUrl: 'https://images.unsplash.com/photo-1515405295579-ba7b45403062'
-      },
-      {
-        id: 'literature',
-        title: translations[lang].collections.literature.title,
-        description: translations[lang].collections.literature.description,
-        imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd5c'
-      }
-    ];
-  }
-
-  function populateCollections(collections) {
-    collectionsContainer.innerHTML = '';
-
-    if (collections.length === 0) {
-      collectionsContainer.innerHTML = '<div class="glide__slide"><p class="text-center text-muted py-5">No collections available.</p></div>';
-      console.log('No collections to display');
-      return;
-    }
-
-    collections.forEach(collection => {
-      const slide = document.createElement('div');
-      slide.className = 'glide__slide';
-      slide.innerHTML = `
-        <div class="collection-card">
-          <div class="collection-img">
-            <img src="${collection.imageUrl || 'https://via.placeholder.com/300'}" alt="${collection.title}" loading="lazy">
-            <div class="collection-overlay"></div>
-          </div>
-          <div class="collection-content">
-            <h3>${collection.title}</h3>
-            <p>${collection.description}</p>
-            <a href="catalog.html?collection=${collection.id}" class="btn btn-primary btn-glow" data-i18n="collections.explore">${
-              translations[localStorage.getItem('language') || 'en'].collections.explore
-            }</a>
-          </div>
-        </div>
-      `;
-      collectionsContainer.appendChild(slide);
-    });
-
-    if (typeof Glide !== 'undefined') {
-      new Glide('.featured-collections', {
-        type: 'carousel',
-        perView: 3,
-        focusAt: 'center',
-        gap: 24,
-        breakpoints: {
-          991: { perView: 2 },
-          575: { perView: 1 }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/books/search?q=${encodeURIComponent(sanitizedQuery)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        autoplay: 4000,
-        hoverpause: true,
-        keyboard: true
-      }).mount();
-      console.log('Glide carousel initialized for featured collections');
-    } else {
-      console.warn('Glide.js not loaded, featured collections carousel not initialized');
+        credentials: 'include',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          searchSuggestions.innerHTML = '<div class="suggestion-item text-warning" role="option">Please log in to search</div>';
+          searchSuggestions.style.display = 'block';
+          return;
+        }
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+
+      const { data: books } = await response.json();
+      window.location.href = `/public/main/search-results.html?q=${encodeURIComponent(sanitizedQuery)}`;
+    } catch (error) {
+      console.error('Error during search:', error);
+      const errorMessage = error.name === 'AbortError' ? 'Search request timed out' : error.message || 'Error performing search';
+      searchSuggestions.innerHTML = `<div class="suggestion-item text-danger" role="option">${errorMessage}</div>`;
+      searchSuggestions.style.display = 'block';
     }
+  });
 
-    applyLanguage(localStorage.getItem('language') || 'en');
-  }
+  // Handle input for real-time suggestions
+  searchQueryInput.addEventListener('input', debounce(async () => {
+    const query = searchQueryInput.value.trim();
+    await fetchSuggestions(query);
+  }, 300));
 
-  fetchFeaturedCollections();
-}
-
-function setupQuickAccess() {
-  const quickAccessContainer = document.querySelector('.quick-access-section .row');
-  if (!quickAccessContainer) {
-    console.warn('Quick access container (.quick-access-section .row) not found');
-    return;
-  }
-
-  function populateQuickAccess(links) {
-    quickAccessContainer.innerHTML = '';
-
-    if (links.length === 0) {
-      quickAccessContainer.innerHTML = '<p class="text-center text-muted py-5">No quick access links available.</p>';
-      console.log('No quick access links to display');
-      return;
-    }
-
-    links.forEach(link => {
-      const col = document.createElement('div');
-      col.className = 'col-lg-3 col-md-6 mb-4';
-      col.innerHTML = `
-        <div class="quick-access-card">
-          <i class="${link.icon} quick-access-icon"></i>
-          <h3 class="quick-access-title">${link.title}</h3>
-          <p class="quick-access-text">${link.description}</p>
-          <a href="${link.url}" class="btn btn-primary btn-glow" data-i18n="quickAccess.explore">${
-            translations[localStorage.getItem('language') || 'en'].quickAccess.explore
-          }</a>
-        </div>
-      `;
-      quickAccessContainer.appendChild(col);
-    });
-
-    console.log(`Populated quick access with ${links.length} links`);
-    applyLanguage(localStorage.getItem('language') || 'en');
-  }
-
-  // Use mock data as no public endpoint is defined for quick access
-  const lang = localStorage.getItem('language') || 'en';
-  console.log('Using mock quick access links for language:', lang);
-  const quickAccessLinks = [
-    {
-      id: 'catalog',
-      title: translations[lang].quickAccess.catalog.title,
-      description: translations[lang].quickAccess.catalog.description,
-      url: 'catalog.html',
-      icon: 'fas fa-book'
-    },
-    {
-      id: 'databases',
-      title: translations[lang].quickAccess.databases.title,
-      description: translations[lang].quickAccess.databases.description,
-      url: 'databases.html',
-      icon: 'fas fa-database'
-    },
-    {
-      id: 'hours',
-      title: translations[lang].quickAccess.hours.title,
-      description: translations[lang].quickAccess.hours.description,
-      url: 'hours.html',
-      icon: 'fas fa-clock'
-    },
-    {
-      id: 'librarian',
-      title: translations[lang].quickAccess.librarian.title,
-      description: translations[lang].quickAccess.librarian.description,
-      url: 'contact.html',
-      icon: 'fas fa-user'
-    }
-  ];
-  populateQuickAccess(quickAccessLinks);
-}
-
-// Carousels
-function setupCarousels() {
-  if (document.querySelector('#bookCarousel')) {
-    console.log('Setting up book carousel');
-    setupBookCarousel();
-  } else {
-    console.warn('Book carousel (#bookCarousel) not found');
-  }
-}
-
-// Counter Animation
-function animateCounters() {
-  const counters = document.querySelectorAll('.stat-number');
-  if (!counters.length) {
-    console.warn('No stat counters (.stat-number) found');
-    return;
-  }
-
-  const speed = 200;
-  counters.forEach(counter => {
-    const target = +counter.getAttribute('data-count');
-    const count = +counter.innerText;
-    const increment = target / speed;
-
-    if (count < target) {
-      counter.innerText = Math.ceil(count + increment);
-      setTimeout(animateCounters, 1);
-    } else {
-      counter.innerText = target;
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!searchForm.contains(e.target) && !searchSuggestions.contains(e.target)) {
+      searchSuggestions.style.display = 'none';
     }
   });
 }
 
-// Initialize everything when DOM is loaded
+ async function loadNewArrivals() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/books/latest?limit=10`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {}),
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+
+        const { data: books } = await response.json();
+        populateCarousel(books);
+      } catch (error) {
+        console.error('Error fetching new arrivals:', error);
+        document.getElementById('carousel-error').textContent = error.message || 'Failed to load new arrivals';
+        document.getElementById('carousel-error').classList.remove('d-none');
+      }
+    }
+
+    function populateCarousel(books) {
+      const carouselInner = document.getElementById('bookCarousel').querySelector('.carousel-inner');
+      const carouselIndicators = document.getElementById('bookCarousel').querySelector('.carousel-indicators');
+      carouselInner.innerHTML = '';
+      carouselIndicators.innerHTML = '';
+
+      if (!books || books.length === 0) {
+        carouselInner.innerHTML = '<div class="carousel-item active"><div class="text-center py-5">No new arrivals found</div></div>';
+        return;
+      }
+
+      // Group books into slides (2 books per slide)
+      const booksPerSlide = 2;
+      const slides = [];
+      for (let i = 0; i < books.length; i += booksPerSlide) {
+        slides.push(books.slice(i, i + booksPerSlide));
+      }
+
+      slides.forEach((slideBooks, index) => {
+        const carouselItem = document.createElement('div');
+        carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+        carouselItem.setAttribute('role', 'group');
+        carouselItem.setAttribute('aria-label', `Slide ${index + 1} of ${slides.length}`);
+
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        slideBooks.forEach(book => {
+          const bookCard = document.createElement('div');
+          bookCard.className = 'col-md-6';
+          bookCard.innerHTML = `
+            <div class="card h-100 book-card" role="article" aria-labelledby="book-title-${book.id}">
+              ${book.coverUrl ? `
+                <img src="${book.coverUrl}" class="card-img-top" alt="${book.title} cover">
+              ` : `
+                <div class="fallback-image">No Cover Available</div>
+              `}
+              <div class="card-body">
+                <h5 class="card-title" id="book-title-${book.id}">${book.title}</h5>
+                <p class="card-text">By ${book.authors.join(', ')}</p>
+                <p class="card-text">
+                  <small>
+                    Language: ${book.language} | 
+                    <span class="status-badge ${book.status === 'AVAILABLE' ? 'status-available' : 'status-checked-out'}" 
+                          data-bs-toggle="tooltip" 
+                          title="${book.status === 'AVAILABLE' ? 'Ready to borrow' : 'Currently borrowed'}">
+                      Status: ${book.status}
+                    </span>
+                  </small>
+                </p>
+                <a href="/public/main/public-book-details.html?id=${book.id}" 
+                   class="btn btn-primary" 
+                   aria-label="View details for ${book.title}">
+                  View Details
+                </a>
+              </div>
+            </div>
+          `;
+          row.appendChild(bookCard);
+        });
+
+        carouselItem.appendChild(row);
+        carouselInner.appendChild(carouselItem);
+
+        // Add indicator
+        const indicator = document.createElement('button');
+        indicator.type = 'button';
+        indicator.setAttribute('data-bs-target', '#bookCarousel');
+        indicator.setAttribute('data-bs-slide-to', index);
+        if (index === 0) indicator.className = 'active';
+        indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+        if (index === 0) indicator.setAttribute('aria-current', 'true');
+        carouselIndicators.appendChild(indicator);
+      });
+
+      // Initialize tooltips
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNewArrivals();
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+    });
+
+// Initialize all functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM content loaded, initializing application');
+  console.log('DOM content loaded, initializing functionality');
   initializeLanguage();
   setupLanguageSelector();
-  setupSearchFunctionality();
-  setupNewsletterForm();
-  setupHeaderScrollEffects();
-  setupSmoothScrolling();
-  setupBackToTopButton();
-  setupCardHoverEffects();
-  setupAuthUI();
-  setupContactForm();
-  setupIntroSection();
-  initAnimations();
-  setupCarousels();
-  setupFeaturedCollections();
-  setupQuickAccess();
-
-  const authButton = document.getElementById('authButton');
-  const dashboardButton = document.getElementById('dashboardButton');
-  if (authButton && dashboardButton) {
-    authButton.style.display = authState.isLoggedIn ? 'none' : 'inline-block';
-    dashboardButton.style.display = authState.isLoggedIn ? 'inline-block' : 'none';
-  } else {
-    console.warn('Auth buttons missing:', { authButton, dashboardButton });
-  }
+  setupSearchBar();
 });

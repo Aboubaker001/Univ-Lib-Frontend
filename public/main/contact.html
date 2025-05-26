@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="title">University Library | Contact Us</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Glide.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@glidejs/glide@3.6.0/dist/css/glide.core.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" href="../img/favicon_io/" type="image/x-icon">    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <!-- Preconnect to CDNs for better performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <style>
         /* Extend main.css styles */
         :root {
@@ -188,43 +202,53 @@
         }
     </style>
 </head>
+
 <body>
+    <!-- Header -->
+  <!-- Header -->
+    <!-- Navigation -->
     <header class="fixed-header">
-        <div class="header-top-bar">
+        <div class="header-top-bar bg-dark">
             <div class="container">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <a href="tel:+213-32-11-22-33"><i class="fas fa-phone-alt me-2"></i>+213-32-11-22-33</a>
-                        <a href="mailto:library@univ-eloued.dz" class="ms-4"><i class="fas fa-envelope me-2"></i>library@univ-eloued.dz</a>
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <div class="header-contact">
+                        <a href="tel:+1234567890" class="text-white me-3"><i class="fas fa-phone-alt me-1"></i> (123) 456-7890</a>
+                        <a href="mailto:info@unilibrary.edu" class="text-white"><i class="fas fa-envelope me-1"></i> info@unilibrary.edu</a>
                     </div>
-                    <div class="language-selector">
-                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="language-text">EN</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-us me-2"></span>English</a></li>
-                            <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-dz me-2"></span>العربية</a></li>
-                        </ul>
+                    <div class="d-flex align-items-center">
+                        <div class="dropdown language-selector">
+                            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-globe me-1"></i> <span class="language-text">EN</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                <li><a class="dropdown-item" href="#" data-lang="en"><span class="flag-icon flag-icon-gb me-2"></span>English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="ar"><span class="flag-icon flag-icon-sa me-2"></span>العربية</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-book-open me-2"></i>
+                    <span class="brand-text">
+                        <span class="brand-main">Uni</span><span class="brand-accent">Library</span>
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav.home">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav.resources">Resources</a></li>
-                        <li class="nav-item"><a class="nav-item"><a class="nav-link" href="#" data-i18n="nav.services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="search-guide.html" data-i18n="nav.searchGuide">Search Guide</a></li>
-                        <li class="nav-item"><a class="nav-link" href="catalog.html" data-i18n="nav.catalog">Catalog</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="contact.html" data-i18n="nav.contact">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="login.html" data-i18n="nav.login">Login</a></li>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="./search-guide.html"><i class="fas fa-search me-1 d-lg-none"></i> <span data-i18n="nav.researchHelp">Research Help</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="./about.html"><i class="fas fa-info-circle me-1 d-lg-none"></i> <span data-i18n="nav.about">About</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="./contact.html"><i class="fas fa-envelope me-1 d-lg-none"></i> <span data-i18n="nav.contact">Contact</span></a></li>
                     </ul>
+                    <div class="ms-lg-3 mt-3 mt-lg-0">
+                        <a href="../login.html" class="btn btn-outline-light me-2"><i class="fas fa-sign-in-alt me-1"></i> <span data-i18n="nav.login">Login</span></a>
+                        <a href="../main/search-guide.html" class="btn btn-accent btn-glow"><i class="fas fa-search me-1"></i> <span data-i18n="nav.quickSearch">Quick Search</span></a>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -245,21 +269,26 @@
                     <form id="contactForm" novalidate>
                         <div class="mb-3">
                             <label for="name" class="form-label" data-i18n="contact.form.name">Name</label>
-                            <input type="text" class="form-control" id="name" required data-i18n="[placeholder]contact.form.namePlaceholder">
+                            <input type="text" class="form-control" id="name" required
+                                data-i18n="[placeholder]contact.form.namePlaceholder">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label" data-i18n="contact.form.email">Email</label>
-                            <input type="email" class="form-control" id="email" required data-i18n="[placeholder]contact.form.emailPlaceholder">
+                            <input type="email" class="form-control" id="email" required
+                                data-i18n="[placeholder]contact.form.emailPlaceholder">
                         </div>
                         <div class="mb-3">
                             <label for="subject" class="form-label" data-i18n="contact.form.subject">Subject</label>
-                            <input type="text" class="form-control" id="subject" required data-i18n="[placeholder]contact.form.subjectPlaceholder">
+                            <input type="text" class="form-control" id="subject" required
+                                data-i18n="[placeholder]contact.form.subjectPlaceholder">
                         </div>
                         <div class="mb-3">
                             <label for="message" class="form-label" data-i18n="contact.form.message">Message</label>
-                            <textarea class="form-control" id="message" rows="5" required data-i18n="[placeholder]contact.form.messagePlaceholder"></textarea>
+                            <textarea class="form-control" id="message" rows="5" required
+                                data-i18n="[placeholder]contact.form.messagePlaceholder"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-submit" data-i18n="contact.form.submit">Send Message</button>
+                        <button type="submit" class="btn btn-submit" data-i18n="contact.form.submit">Send
+                            Message</button>
                     </form>
                 </div>
                 <div class="col-lg-6 mb-4" data-aos="fade-left">
@@ -267,7 +296,8 @@
                     <div class="contact-card mb-3">
                         <i class="fas fa-map-marker-alt contact-icon"></i>
                         <h4 data-i18n="contact.info.address.title">Address</h4>
-                        <p data-i18n="contact.info.address.value">El Oued University, PO Box 789, El Oued 39000, Algeria</p>
+                        <p data-i18n="contact.info.address.value">El Oued University, PO Box 789, El Oued 39000, Algeria
+                        </p>
                     </div>
                     <div class="contact-card mb-3">
                         <i class="fas fa-phone-alt contact-icon"></i>
@@ -293,7 +323,9 @@
         <div class="container">
             <h2 class="text-center mb-5" data-i18n="map.title">Find Us on the Map</h2>
             <div class="map-container" data-aos="zoom-in">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3326.373171309017!2d6.856928315202299!3d33.36728998079847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12594e7b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sUniversit%C3%A9%20d%27El%20Oued!5e0!3m2!1sen!2sdz!4v1698765432109!5m2!1sen!2sdz" width="100%" height="100%" allowfullscreen="" title="google-map"></iframe>
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3326.373171309017!2d6.856928315202299!3d33.36728998079847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12594e7b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sUniversit%C3%A9%20d%27El%20Oued!5e0!3m2!1sen!2sdz!4v1698765432109!5m2!1sen!2sdz"
+                    width="100%" height="100%" allowfullscreen="" title="google-map"></iframe>
             </div>
         </div>
     </section>
@@ -302,12 +334,17 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4">
-                    <a class="footer-brand" href="index.html"><span class="brand-main">Uni</span><span class="brand-accent">Library</span></a>
-                    <p class="footer-about mt-3" data-i18n="footer.about">Providing world-class resources and services since 1965.</p>
+                    <a class="footer-brand" href="index.html"><span class="brand-main">Uni</span><span
+                            class="brand-accent">Library</span></a>
+                    <p class="footer-about mt-3" data-i18n="footer.about">Providing world-class resources and services
+                        since 1965.</p>
                     <div class="footer-social mt-3">
-                        <a href="https://facebook.com/univeloued" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/univeloued" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="https://youtube.com/univeloued" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="https://facebook.com/univeloued" class="social-icon" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com/univeloued" class="social-icon" aria-label="Twitter"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="https://youtube.com/univeloued" class="social-icon" aria-label="YouTube"><i
+                                class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -322,7 +359,8 @@
                 <div class="col-lg-4">
                     <h4 class="footer-title" data-i18n="footer.contact.title">Contact Us</h4>
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="footer.contact.address">El Oued University, PO Box 789, El Oued 39000, Algeria</span></p>
+                        <p><i class="fas fa-map-marker-alt me-2"></i><span data-i18n="footer.contact.address">El Oued
+                                University, PO Box 789, El Oued 39000, Algeria</span></p>
                         <p><i class="fas fa-phone-alt me-2"></i>+213-32-11-22-33</p>
                         <p><i class="fas fa-envelope me-2"></i>library@univ-eloued.dz</p>
                     </div>
@@ -573,4 +611,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniLibrary | Book Details</title>
-
+  <title>UniLibrary | Search Results</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- AOS CSS -->
@@ -20,37 +19,46 @@
     <!-- Preconnect to CDNs for better performance -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <style>
-    .book-details-card {
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">  <style>
+    .book-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       border: none;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       background: #fff;
     }
-    .book-details-card img {
-      max-height: 400px;
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .book-card img {
+      height: 200px;
       object-fit: cover;
       width: 100%;
     }
-    .book-details-card .card-body {
-      padding: 2rem;
+    .book-card .card-body {
+      padding: 1.5rem;
     }
-    .book-details-card .card-title {
-      font-size: 1.75rem;
-      font-weight: 700;
+    .book-card .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
       color: #333;
-      margin-bottom: 1rem;
-    }
-    .book-details-card .card-text {
-      color: #666;
-      font-size: 1rem;
       margin-bottom: 0.75rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .status-badge {
-      font-size: 0.9rem;
-      padding: 0.3rem 0.6rem;
+    .book-card .card-text {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+    .book-card .status-badge {
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
       border-radius: 12px;
     }
     .status-available {
@@ -61,9 +69,20 @@
       background-color: #f8d7da;
       color: #721c24;
     }
+    .book-card .btn-primary {
+      background-color: #007bff;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .book-card .btn-primary:hover {
+      background-color: #0056b3;
+    }
     .fallback-image {
       background-color: #f0f0f0;
-      height: 400px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -71,17 +90,17 @@
       font-style: italic;
     }
     @media (max-width: 576px) {
-      .book-details-card .card-title {
-        font-size: 1.5rem;
+      .book-card .card-title {
+        font-size: 1.1rem;
       }
-      .book-details-card .card-text {
-        font-size: 0.95rem;
+      .book-card .card-text {
+        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
-    <!-- Header -->
+ <!-- Header -->
   <!-- Header -->
     <!-- Navigation -->
     <header class="fixed-header">
@@ -132,54 +151,34 @@
     </header>
 
   <main class="container my-5">
-    <div id="book-details" class="row">
-      <div class="col-md-8 offset-md-2">
-        <div class="card book-details-card" role="article" aria-labelledby="book-title">
-          <div id="book-image" class="fallback-image">Loading...</div>
-          <div class="card-body">
-            <h1 class="card-title" id="book-title" data-i18n="book.title">Loading...</h1>
-            <p class="card-text"><strong data-i18n="book.authors">Authors:</strong> <span id="authors">...</span></p>
-            <p class="card-text"><strong data-i18n="book.isbn">ISBN:</strong> <span id="isbn">...</span></p>
-            <p class="card-text"><strong data-i18n="book.edition">Edition:</strong> <span id="edition">...</span></p>
-            <p class="card-text"><strong data-i18n="book.publisher">Publisher:</strong> <span id="publisher">...</span></p>
-            <p class="card-text"><strong data-i18n="book.publicationYear">Publication Year:</strong> <span id="publicationYear">...</span></p>
-            <p class="card-text"><strong data-i18n="book.pageCount">Page Count:</strong> <span id="pageCount">...</span></p>
-            <p class="card-text"><strong data-i18n="book.language">Language:</strong> <span id="language">...</span></p>
-            <p class="card-text"><strong data-i18n="book.keywords">Keywords:</strong> <span id="keywords">...</span></p>
-            <p class="card-text">
-              <strong data-i18n="book.status">Status:</strong>
-              <span id="status" class="status-badge" data-bs-toggle="tooltip" title="Loading...">...</span>
-            </p>
-            <a href="/public/main/catalog.html" class="btn btn-secondary mt-3" data-i18n="book.back" aria-label="Back to catalog">Back to Browse</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+    <h1 class="mb-4">Search Results</h1>
+    <div id="search-results" class="row"></div>
+    <div id="no-results" class="alert alert-info d-none" role="alert">No results found.</div>
   </main>
 
   <footer class="bg-light py-3">
     <div class="container text-center">
-      <p data-i18n="footer.copyright">© <span id="current-year"></span> UniLibrary. All rights reserved.</p>
+      <p>© <span id="current-year"></span> UniLibrary. All rights reserved.</p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/main.js"></script> <!-- Includes language switching -->
+  <script src="../js/api.js"></script> <!-- Adjust path if needed -->
   <script>
+    // search-results.js
     const API_BASE_URL = 'http://localhost:5000/api';
 
-    async function loadBookDetails() {
+    async function displaySearchResults() {
       const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+      const query = urlParams.get('q')?.trim();
 
-      if (!id) {
-        showError('No book ID provided');
+      if (!query || query.length < 2) {
+        document.getElementById('no-results').classList.remove('d-none');
         return;
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/books/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/books/search?q=${encodeURIComponent(query)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -193,52 +192,63 @@
           throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
         }
 
-        const { data: book } = await response.json();
-        displayBookDetails(book);
+        const { data: books } = await response.json();
+        const resultsContainer = document.getElementById('search-results');
+        const noResults = document.getElementById('no-results');
+
+        if (!books || books.length === 0) {
+          noResults.classList.remove('d-none');
+          return;
+        }
+
+        books.forEach(book => {
+          const bookCard = document.createElement('div');
+          bookCard.className = 'col-md-4 col-sm-6 mb-4';
+          bookCard.innerHTML = `
+            <div class="card h-100 book-card" role="article" aria-labelledby="book-title-${book.id}">
+              ${book.coverUrl ? `
+                <img src="${book.coverUrl}" class="card-img-top" alt="${book.title} cover" loading="lazy">
+              ` : `
+                <div class="fallback-image">No Cover Available</div>
+              `}
+              <div class="card-body">
+                <h5 class="card-title" id="book-title-${book.id}">${book.title}</h5>
+                <p class="card-text">By ${book.authors.join(', ')}</p>
+                <p class="card-text">
+                  <small>
+                    Language: ${book.language} | 
+                    <span class="status-badge ${book.status === 'AVAILABLE' ? 'status-available' : 'status-checked-out'}" 
+                          data-bs-toggle="tooltip" 
+                          title="${book.status === 'AVAILABLE' ? 'Ready to borrow' : 'Currently borrowed'}">
+                      Status: ${book.status}
+                    </span>
+                  </small>
+                </p>
+                <a href="/public/main/public-book-details.html?id=${book.id}" 
+                   class="btn btn-primary" 
+                   aria-label="View details for ${book.title}">
+                  View Details
+                </a>
+              </div>
+            </div>
+          `;
+          resultsContainer.appendChild(bookCard);
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
       } catch (error) {
-        console.error('Error fetching book details:', error);
-        showError(error.message || 'Failed to load book details');
-      }
-    }
-
-    function displayBookDetails(book) {
-      document.getElementById('book-title').textContent = book.title || 'N/A';
-      document.getElementById('authors').textContent = book.authors?.join(', ') || 'N/A';
-      document.getElementById('isbn').textContent = book.isbn || 'N/A';
-      document.getElementById('edition').textContent = book.edition || 'N/A';
-      document.getElementById('publisher').textContent = book.publisher || 'N/A';
-      document.getElementById('publicationYear').textContent = book.publicationYear || 'N/A';
-      document.getElementById('pageCount').textContent = book.pageCount || 'N/A';
-      document.getElementById('language').textContent = book.language || 'N/A';
-      document.getElementById('keywords').textContent = book.keywords?.join(', ') || 'N/A';
-
-      const statusSpan = document.getElementById('status');
-      statusSpan.textContent = book.status || 'N/A';
-      statusSpan.className = `status-badge ${book.status === 'AVAILABLE' ? 'status-available' : 'status-checked-out'}`;
-      statusSpan.setAttribute('title', book.status === 'AVAILABLE' ? 'Ready to borrow' : 'Currently borrowed');
-
-      const imageDiv = document.getElementById('book-image');
-      if (book.coverUrl) {
-        imageDiv.innerHTML = `<img src="${book.coverUrl}" class="card-img-top" alt="${book.title} cover" loading="lazy">`;
-      } else {
-        imageDiv.innerHTML = 'No Cover Available';
+        console.error('Error fetching search results:', error);
+        document.getElementById('no-results').innerHTML = error.message || 'Error loading results.';
+        document.getElementById('no-results').classList.remove('d-none');
       }
 
-      // Initialize tooltip
-      new bootstrap.Tooltip(statusSpan);
-    }
-
-    function showError(message) {
-      const errorDiv = document.getElementById('error-message');
-      errorDiv.textContent = message;
-      errorDiv.classList.remove('d-none');
-      document.getElementById('book-details').classList.add('d-none');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadBookDetails();
+      // Set current year in footer
       document.getElementById('current-year').textContent = new Date().getFullYear();
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', displaySearchResults);
   </script>
 </body>
 </html>
